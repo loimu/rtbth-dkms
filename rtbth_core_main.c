@@ -31,7 +31,7 @@
 #include "rtbth_3298.h"
 #include "rtbt_ctrl.h"
 
-#define VERSION	"3.9.4.1"
+#define VERSION	"3.9.4.2"
 
 MODULE_AUTHOR("Ralink Tech.");
 MODULE_DESCRIPTION("Support for Ralink Bluetooth RT3290 Cards");
@@ -45,13 +45,13 @@ static struct rtbt_dev_entry *rtbt_pci_dev_list = NULL;
 static int __init rtbth_init(void)
 {
 	struct rtbt_dev_entry *ent;
-	
+
 	DebugPrint(TRACE, DBG_INIT, "--->%s()\n", __FUNCTION__);
-    
+
 #ifdef RT3298
 	ent = rtbt_3298_init();
 #endif // RT3298 //
-	
+
 	if (ent)
 	{
 		rtbt_pci_dev_list = ent;
