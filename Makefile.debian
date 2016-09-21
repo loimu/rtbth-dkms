@@ -1,0 +1,15 @@
+#include config.mk
+
+all:
+
+clean:
+
+install: all
+	mkdir -p $(DESTDIR)/usr/src/rtbth-3.9.3/include
+	install -m 0644 -o root -g root *.c $(DESTDIR)/usr/src/rtbth-3.9.3
+	install -m 0644 -o root -g root include/* \
+		$(DESTDIR)/usr/src/rtbth-3.9.3/include
+	install -m 0644 -o root -g root Makefile $(DESTDIR)/usr/src/rtbth-3.9.3
+	install -m 0755 -o root -g root tools/49rtbt $(DESTDIR)/usr/lib/pm-utils/sleep.d/
+	install -m 0755 -o root -g root tools/rtbt $(DESTDIR)/usr/bin/
+	install -m 0644 -o root -g root tools/ralink-bt.conf $(DESTDIR)/etc/modprobe.d/
