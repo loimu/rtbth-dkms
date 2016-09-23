@@ -25,6 +25,7 @@
 *************************************************************************/
 
 #include <linux/pci.h>
+#include <linux/errno.h>
 #include "rt_linux.h"
 #include "hps_bluez.h"
 #include "rtbt_osabl.h"
@@ -38,10 +39,10 @@ static inline unsigned char rtbt_get_pkt_type(struct sk_buff *skb)
 	return hci_skb_pkt_type(skb);
 #else
 	return bt_cb(skb)->pkt_type;
-#endif // LINUX_VERSION_CODE >= KERNEL_VERSION(4,5,0)
+#endif
 #else
 	return skb->pkt_type;
-#endif // LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,14)
+#endif
 }
 
 static inline void rtbt_set_pkt_type(struct sk_buff *skb, unsigned char type)
@@ -51,10 +52,10 @@ static inline void rtbt_set_pkt_type(struct sk_buff *skb, unsigned char type)
 	hci_skb_pkt_type(skb) = type;
 #else
 	bt_cb(skb)->pkt_type = type;
-#endif // LINUX_VERSION_CODE >= KERNEL_VERSION(4,5,0)
+#endif
 #else
 	skb->pkt_type = type;
-#endif // LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,14)
+#endif
 }
 
 
@@ -234,26 +235,29 @@ if (pkt_type == HCI_SCODATA_PKT)
 
 int rtbt_hci_dev_open(struct hci_dev *hdev)
 {
-	NTSTATUS status = STATUS_FAILURE;
+	int status = -EBUSY;
 	struct rtbt_os_ctrl *os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hdev);
 	//struct rtbt_hps_ops *hps_ops;
 
 	printk("-->%s()\n", __FUNCTION__);
 
-	//if (test_and_set_bit(HCI_RUNNING, &hdev->flags))
 	if (test_bit(HCI_RUNNING, &hdev->flags))
 		return 0;
 
 	if (os_ctrl && os_ctrl->hps_ops && os_ctrl->hps_ops->open)
 		status = os_ctrl->hps_ops->open(os_ctrl->dev_ctrl);
 	else {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,4,0)
 		clear_bit(HCI_RUNNING, &hdev->flags);
+#endif
 		printk("Error: os_ctrl->hps_ops->dev_open is null\n");
 	}
 
 	if (status == 0) {
 		os_ctrl->sco_tx_seq = -1;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,4,0)
 		set_bit(HCI_RUNNING, &hdev->flags);
+#endif
 	}
 	printk("<--%s(), status=%d\n", __FUNCTION__, status);
 
@@ -262,15 +266,20 @@ int rtbt_hci_dev_open(struct hci_dev *hdev)
 
 int rtbt_hci_dev_close(struct hci_dev *hdev)
 {
-	NTSTATUS status = STATUS_FAILURE;
+	int status = -EBUSY;
 	struct rtbt_os_ctrl *os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hdev);
 
 	printk("--->%s()\n", __FUNCTION__);
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,4,0)
 	if (!test_and_clear_bit(HCI_RUNNING, &(hdev->flags))){
+#else
+	if (!test_bit(HCI_RUNNING, &(hdev->flags))){
+#endif
 		printk("%s():Directly return due to hdev->flags=0x%lx\n", __FUNCTION__, hdev->flags);
 		return 0;
 	}
+
 	rtbt_hci_dev_flush(hdev);
 
 	if (os_ctrl && os_ctrl->hps_ops && os_ctrl->hps_ops->close)
@@ -394,10 +403,10 @@ int rtbt_hps_iface_init(
 				hdev->dev_type = HCI_PRIMARY;
 #else
 				hdev->dev_type = HCI_BREDR;
-#endif // LINUX_VERSION_CODE >= KERNEL_VERSION(4,8,0)
+#endif
 #else
 				hdev->type = HCI_PCI;
-#endif // LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,34)
+#endif
 				pci_set_drvdata(pcidev, hdev);
 				SET_HCIDEV_DEV(hdev, &pcidev->dev);
 			}

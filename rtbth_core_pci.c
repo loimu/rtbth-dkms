@@ -51,25 +51,25 @@ static int rtbt_pci_suspend(struct pci_dev *pdev, pm_message_t state)
 	struct rtbt_os_ctrl *os_ctrl;
 
 //    printk("%s():Into suspend! pm_message_state=%d\n", __FUNCTION__, state);//sean wang linux, fix the build warning, type casting
-	
+
 	if (hci_dev == NULL){
 		printk("%s(): pci_get_drvdata failed!\n", __FUNCTION__);
 		return -1;
 	}
-	
+
 	os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hci_dev);
 	if (os_ctrl == NULL) {
 		printk("%s(): hci_dev->driver_data is NULL!\n", __FUNCTION__);
 		return -1;
 	}
-    
+
 //msleep(10000);
 //    rtbt_hps_iface_detach(os_ctrl);
 //    os_ctrl->hps_ops->suspend(os_ctrl->dev_ctrl);
 
 
 	printk("Exit from rtbt_pci_remove!\n");
-    
+
 	return 0;
 }
 
@@ -107,14 +107,14 @@ static int rtbt_pci_probe(struct pci_dev *pdev,
 	void __iomem *csr_addr = NULL;
 	int rv;
 
-	printk("===> %s():probe for device(Vendor=0x%x, Device=0x%p)\n", 
+	printk("===> %s():probe for device(Vendor=0x%x, Device=0x%p)\n",
 			__FUNCTION__, pdev->vendor, &pdev->device);
 
 	if (!id->driver_data) {
 		printk("pci_device_id->driver_data is NULL!\n");
 		return -1;
 	}
-	    
+
 	dev_ops = (struct rtbt_dev_ops *)(id->driver_data);
 	if (!(dev_ops->dev_ctrl_init && dev_ops->dev_ctrl_deinit &&
 		dev_ops->dev_resource_init && dev_ops->dev_resource_deinit &&
@@ -122,7 +122,7 @@ static int rtbt_pci_probe(struct pci_dev *pdev,
 	    printk("dev_ops have null function pointer!\n");
 	    return -1;
 	}
-	
+
 	rv = pci_enable_device(pdev);
 	if (rv) {
 		printk("call pci_enable_dev failed(%d)\n", rv);
@@ -138,7 +138,7 @@ static int rtbt_pci_probe(struct pci_dev *pdev,
 		printk("Request PCI resource failed(%d)\n", rv);
 		goto err_out_disable_dev;
 	}
-	
+
 	/* map physical address to virtual address for accessing register */
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,9)
 	csr_addr = pci_iomap(pdev, 0, pci_resource_len(pdev, 0));
@@ -152,8 +152,8 @@ static int rtbt_pci_probe(struct pci_dev *pdev,
 		goto err_out_free_res;
 	} else {
 		printk("%s():PCI Dev(%s) get resource at 0x%lx,VA 0x%lx,IRQ %d.\n",
-				__FUNCTION__, print_name, 
-				(ULONG)pci_resource_start(pdev, 0), 
+				__FUNCTION__, print_name,
+				(ULONG)pci_resource_start(pdev, 0),
 				(ULONG)csr_addr, pdev->irq);
 	}
 
@@ -164,9 +164,9 @@ static int rtbt_pci_probe(struct pci_dev *pdev,
 		printk("set MWI failed(%d)\n", rv);
 		goto err_out_free_res;
 	}
-	
+
 	pci_set_master(pdev);
-	
+
 	/* device control block initialization */
 	printk("call dev_ops->dev_ctrl_init!\n");
 	if (dev_ops->dev_ctrl_init(&os_ctrl, csr_addr))
@@ -175,14 +175,14 @@ static int rtbt_pci_probe(struct pci_dev *pdev,
 	os_ctrl->dev_ops = dev_ops;
 
 //    rtbth_us_init(os_ctrl->dev_ctrl);
-    
+
 	printk("call dev_ops->dev_resource_init!\n");
 	if (dev_ops->dev_resource_init(os_ctrl))
 		goto err_dev_ctrl;
 
     os_ctrl->if_dev = (void *) pdev;
 
-    rtbth_us_init(os_ctrl->dev_ctrl); 
+    rtbth_us_init(os_ctrl->dev_ctrl);
 	/* Init the host protocol stack hooking interface */
 	if (rtbt_hps_iface_init(RAL_INF_PCI, pdev, os_ctrl))
 		goto err_dev_resource;
@@ -190,7 +190,7 @@ static int rtbt_pci_probe(struct pci_dev *pdev,
 	/* Link the host protocol stack interface to the protocl stack */
 	if (rtbt_hps_iface_attach(os_ctrl))
 		goto err_hps_iface;
-#endif 		
+#endif
 	printk("<---%s():Sucess\n", __FUNCTION__);
 	return 0;
 
@@ -205,7 +205,7 @@ err_dev_resource:
 err_dev_ctrl:
 	printk("err: call rtbt_dev_ctrl_deinit()\n");
 	dev_ops->dev_ctrl_deinit(os_ctrl);
-	
+
 err_out_free_res:
 	if (csr_addr) {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,9)
@@ -220,7 +220,7 @@ err_out_free_res:
 
 err_out_disable_dev:
 	pci_disable_device(pdev);
-		
+
 	printk("<---%s():fail\n", __FUNCTION__);
 	return -1;
 }
@@ -231,12 +231,12 @@ static void  rtbt_pci_remove(struct pci_dev *pdev)
 	struct rtbt_os_ctrl *os_ctrl;
 	struct rtbt_dev_ops *dev_ops;
 	void __iomem *csr_addr;
-	
+
 	if (hci_dev == NULL){
 		printk("%s(): pci_get_drvdata failed!\n", __FUNCTION__);
 		return;
 	}
-	
+
 	os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hci_dev);
 	if (os_ctrl == NULL) {
 		printk("%s(): hci_dev->driver_data is NULL!\n", __FUNCTION__);
@@ -244,12 +244,12 @@ static void  rtbt_pci_remove(struct pci_dev *pdev)
 	}
 
 	csr_addr = os_ctrl->if_ops.pci_ops.csr_addr;
-	printk("%s():csr_addr=0x%lx!\n", __FUNCTION__, 
+	printk("%s():csr_addr=0x%lx!\n", __FUNCTION__,
 			(unsigned long)os_ctrl->if_ops.pci_ops.csr_addr);
 
-#if 0	
+#if 0
 	rtbt_hps_iface_detach(os_ctrl);
-#endif    
+#endif
 	rtbt_hps_iface_deinit(RAL_INF_PCI, pdev, os_ctrl);
 
     rtbth_us_deinit(os_ctrl->dev_ctrl);
@@ -264,9 +264,9 @@ static void  rtbt_pci_remove(struct pci_dev *pdev)
 	}
 
  //   rtbth_us_deinit(os_ctrl->dev_ctrl);
-    
+
 	pci_set_drvdata(pdev, NULL);
-	
+
 	if (csr_addr != NULL) {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,9)
 		pci_iounmap(pdev, csr_addr);
@@ -277,7 +277,7 @@ static void  rtbt_pci_remove(struct pci_dev *pdev)
 
 	pci_release_region(pdev, 0);
 	pci_disable_device(pdev);
-	
+
 	printk("Exit from rtbt_pci_remove!\n");
 }
 
@@ -304,7 +304,7 @@ static struct pci_driver rtbt_pci_driver = {
 /*******************************************************************************
 
 	Device IRQ related functions.
-	
+
  *******************************************************************************/
 
 /*++
@@ -338,10 +338,10 @@ BthIsr(int irq, void *dev_instance, struct pt_regs *regs)
 	ASSERT(hdev);
 
 	if (!test_bit(HCI_RUNNING, &hdev->flags)) {
-printk("%s():-->HCI_RUNNING not set!\n", __FUNCTION__);
+		printk("%s():-->HCI_RUNNING not set!\n", __FUNCTION__);
 		goto done;
 	}
-	
+
 	if (hdev){
 		os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hdev);
 		ASSERT(os_ctrl);
@@ -357,7 +357,7 @@ printk("%s():-->HCI_RUNNING not set!\n", __FUNCTION__);
 
 done:
 	//printk("<--BthIsr Done, retval=%d\n", retval);
-	
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0)
 	return  IRQ_HANDLED;
 #endif
@@ -369,26 +369,26 @@ int RtmpOSIRQRequest(IN void *if_dev, void *dev_id)
 	struct pci_dev *pdev = if_dev;
 	struct hci_dev *hdev = (struct hci_dev *)dev_id;
 	int retval = 0;
-	
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,22)
 	retval = request_irq(pdev->irq, BthIsr, IRQF_SHARED, hdev->name, hdev);
 #else
 	retval = request_irq(pdev->irq, BthIsr, SA_SHIRQ, hdev->name, hdev);
 #endif
-	if (retval != 0) 
+	if (retval != 0)
 		printk("RT_BT: request_irq (IRQ=%d) ERROR(%d)\n", pdev->irq, retval);
 	else
 		printk("%s(): request_irq (IRQ=%d)done, isr_handler=0x%lx!\n", __FUNCTION__, pdev->irq, (ULONG)BthIsr);
-	
-	return retval; 
-	
+
+	return retval;
+
 }
 
 
 int RtmpOSIRQRelease(IN void *if_dev, void *dev_id)
 {
 	struct pci_dev *pdev = if_dev;
-	
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0)
 	synchronize_irq(pdev->irq);
 #endif
@@ -417,7 +417,7 @@ int rtbt_dma_mem_alloc(
 	OUT	PHYSICAL_ADDRESS *phy_addr)
 {
 	*virt_addr = (PVOID)pci_alloc_consistent((struct pci_dev *)if_dev,
-												sizeof(char)*len, 
+												sizeof(char)*len,
 												(dma_addr_t *)phy_addr);
 
 	return TRUE;
@@ -430,8 +430,8 @@ void rtbt_dma_mem_free(
 	IN unsigned long len,
 	IN void *virt_addr,
 	IN PHYSICAL_ADDRESS phy_addr)
-{	
-	pci_free_consistent((struct pci_dev *)if_dev, 
+{
+	pci_free_consistent((struct pci_dev *)if_dev,
 						len, virt_addr, phy_addr);
 }
 
@@ -445,7 +445,7 @@ static int rtbt_linux_pci_ids_create(struct rtbt_dev_entry *pRalDevList)
 	int size = 0;
 	int phase = 1;
 	//int status;
-	
+
 	/* First parsing the IdTb and convert to linux specific "pci_device_id" format */
 loop:
 	pDevIDList = pRalDevList->pDevIDList;
@@ -499,7 +499,7 @@ loop:
 /*******************************************************************************
 
 	Functions used for OS hooking functions.
-	
+
  *******************************************************************************/
 int rtbt_iface_pci_hook(struct rtbt_dev_entry *pIdTb)
 {
@@ -511,7 +511,7 @@ int rtbt_iface_pci_hook(struct rtbt_dev_entry *pIdTb)
 	if (rtbt_pci_driver.id_table  == NULL){
 		printk("id_table is NULL!\n");
 		return -1;
-	} 
+	}
 #else
 	//rtbt_pci_driver.id_table = rtbt_pci_ids;
 	//printk("rtbt_iface_pci_hook! IdCnt=%d!rtbt_pci_ids=0x%x\n", IdCnt, (ULONG)rtbt_pci_ids);
@@ -523,7 +523,7 @@ int rtbt_iface_pci_hook(struct rtbt_dev_entry *pIdTb)
 
 
 int rtbt_iface_pci_unhook(struct rtbt_dev_entry *pIdTb)
-{	
+{
 	pci_unregister_driver(&rtbt_pci_driver);
 
 #if 1 //def OS_ABL_SUPPORT
@@ -531,7 +531,7 @@ int rtbt_iface_pci_unhook(struct rtbt_dev_entry *pIdTb)
 		kfree(pIdTb->os_private);
 	rtbt_pci_driver.id_table = NULL;
 #endif /* OS_ABL_SUPPORT */
-	
+
 	printk("remove rtbt_pci_driver done!\n");
 	return 0;
 }
@@ -587,7 +587,7 @@ BthGetTxRingSize(
 		case TX_RING_LEACL_IDX:
 		case TX_RING_LEACL_IDX+1:
 			return TX_LEACL_RING_SIZE;
-			
+
 		default:
 			DebugPrint(ERROR, DBG_INIT, "BthGetTxRingSize: Wrong idx(%d)\n", RingIdx);
 			return 0;
@@ -843,10 +843,10 @@ NTSTATUS BthInitTxRingByIdx(
 
 		pDmaBuf = &pTxRing->Cell[Index].DmaBuf;
 		pDmaBuf->AllocSize = TxRingPacketSize;
-		rtbt_dma_mem_alloc(os_ctrl->if_dev, 
-						pDmaBuf->AllocSize, 
-						FALSE, 
-						&pDmaBuf->AllocVa, 
+		rtbt_dma_mem_alloc(os_ctrl->if_dev,
+						pDmaBuf->AllocSize,
+						FALSE,
+						&pDmaBuf->AllocVa,
 						&pDmaBuf->AllocPa);
 
 		if (pDmaBuf->AllocVa== NULL)
@@ -914,7 +914,7 @@ NTSTATUS BthInitSend(
 	//PHYSICAL_ADDRESS	RingPa;
 	RTMP_DMABUF 		*pTxDescBuf;
 	UINT8				TxRingSize;
-		
+
 	DebugPrint(TRACE, DBG_INIT, "--> BthInitSend\n");
 
 	for (Num = 0; Num < NUM_OF_TX_RING; Num++)
@@ -925,11 +925,11 @@ NTSTATUS BthInitSend(
 				BthGetTxRingPacketSize(pAd, Num),
 				BthGetTxRingOffset(pAd, Num));
 	}
-	
+
 	/*
 		For each TxDesc, the size is "TXD_SIZE"
 		For each TxRing, we allocate "TX_RING_SIZE" TxDescriptors
-		Totally we have to allocate memory with size 
+		Totally we have to allocate memory with size
 			= "NUM_OF_TX_RING" * "TX_RING_SIZE" * "TXD_SIZE"
 	*/
 	pTxDescBuf = &pAd->TxDescMemPtr;
@@ -952,7 +952,7 @@ NTSTATUS BthInitSend(
 							"\tAfter Aligned, RingBaseVa at 0x%x(0x%x)\n",
 				pTxDescBuf->AllocVa, pTxDescBuf->AllocPa,
 				pTxDescBuf->AllocSize, RingBaseVa, RingBasePa);
-	
+
 	RingBasePaHigh = 0;
 	RingBasePaLow = RingBasePa;
 
@@ -962,7 +962,7 @@ NTSTATUS BthInitSend(
 		UINT32				TotalAllocBuffSz = 0;
 		UINT32				PerRingAllocBuffSz = 0;
 
-	DebugPrint(INFO, DBG_INIT, "Assign TxRing(Idx:%d) at virtAddr(0x%x), phyAddr(0x%x)\n", 
+	DebugPrint(INFO, DBG_INIT, "Assign TxRing(Idx:%d) at virtAddr(0x%x), phyAddr(0x%x)\n",
 				Num, RingBaseVa, RingBasePaLow);
 		if (BthInitTxRingByIdx(pAd, Num, RingBaseVa, RingBasePaHigh, RingBasePaLow, &PerRingAllocBuffSz) != STATUS_SUCCESS)
 		{
@@ -986,7 +986,7 @@ NTSTATUS BthInitSend(
 				TotalAllocBuffSz);
 		}
 	}
-	
+
 	DebugPrint(TRACE, DBG_INIT, "<-- BthInitSend\n");
 
 	return Status;
@@ -995,7 +995,7 @@ NTSTATUS BthInitSend(
 err:
 #endif
 	return STATUS_UNSUCCESSFUL;
-	
+
 }
 
 
@@ -1039,7 +1039,7 @@ NTSTATUS BthInitRecv(IN RTBTH_ADAPTER *pAd)
 	}
 	RtlZeroMemory(RingBaseVa, NUM_OF_RX_RING * RX_RING_SIZE * RXD_SIZE);
 
-	
+
 	for (Num = 0; Num < NUM_OF_RX_RING; Num++)
 	{
 		pRxDescRing = &pAd->RxDescRing[Num];
@@ -1054,7 +1054,7 @@ NTSTATUS BthInitRecv(IN RTBTH_ADAPTER *pAd)
 		pRxDescRing->AllocPa = RingBasePa;
 
 		/*
-			RX_BASE_PRT0: absolute 32bit address 
+			RX_BASE_PRT0: absolute 32bit address
 			RX_BASE_PTR1: offset address
 		*/
 		RingPa = ((Num == 0) ? RingBasePa : (Num * RX_RING_SIZE * RXD_SIZE));
@@ -1062,7 +1062,7 @@ NTSTATUS BthInitRecv(IN RTBTH_ADAPTER *pAd)
 		RT_IO_WRITE32(pAd, RX_MAX_CNT + Num * RINGREG_DIFF, RX_RING_SIZE);
 		RT_IO_WRITE32(pAd, RX_CRX_IDX + Num * RINGREG_DIFF, (RX_RING_SIZE-1));
 
-		DebugPrint(ERROR, DBG_INIT, "RX_Base_PTR%d(0x%02x)= 0x%x\n", 
+		DebugPrint(ERROR, DBG_INIT, "RX_Base_PTR%d(0x%02x)= 0x%x\n",
 							Num, RX_BASE_PTR0 + Num * RINGREG_DIFF, RingPa);
 
 
@@ -1112,7 +1112,7 @@ VOID BthFreeRfd(IN RTBTH_ADAPTER *pAd)
 	RT_DMACB *pDmaCb;
 	RTMP_DMABUF *pRxDescRing, *pDmaBuf;
 	UINT8	TxRingSize;
-	
+
 	DebugPrint(TRACE, DBG_INIT, "BthFreeRfd ==>\n");
 
 	/* Free RxRing */
@@ -1140,7 +1140,7 @@ VOID BthFreeRfd(IN RTBTH_ADAPTER *pAd)
 	}
 	DebugPrint(TRACE, DBG_INIT, "Free RxDescRing[0] staff done\n");
 
-	
+
 	/* Free Tx Buffer Ring */
 	for (RingIdx = 0; RingIdx < NUM_OF_TX_RING; RingIdx++)
 	{
@@ -1176,7 +1176,7 @@ VOID reg_dump_txdesc(struct _RTBTH_ADAPTER *pAd)//sean wang
 {
 	int num;
 	UINT32 regAddr, regVal;
-	
+
 
 	DebugPrint(NONE, DBG_MISC, "%s():Dump TxDesc registers:\n", __FUNCTION__);
 	for (num = 0; num < NUM_OF_TX_RING; num++)
@@ -1198,7 +1198,7 @@ VOID reg_dump_rxdesc(struct _RTBTH_ADAPTER *pAd)//sean wang
 {
 	int num;
 	UINT32 regAddr, regVal;
-	
+
 
 	DebugPrint(NONE, DBG_MISC, "%s():Dump RxDesc registers:\n", __FUNCTION__);
 	for (num = 0; num < NUM_OF_RX_RING; num++)
@@ -1226,7 +1226,7 @@ VOID RtbtResetPDMA(IN RTBTH_ADAPTER *pAd)
 	PTXD_STRUC  		pTxD;
 	UINT8				TxRingSize;
 	UINT32				regVal;
-	
+
 	// Reset PDMA TX:DTX and RX:DRX
 	RT_IO_WRITE32(pAd, PDMA_RST_CSR, 0x33fffff);
 
@@ -1320,7 +1320,7 @@ BthRxPacket(
 	else
 		GET = RxDmaIdx + RX_RING_SIZE - *pSwReadIndex;
 
-DebugPrint(TRACE, DBG_MISC, "BthRxPacket ..... GET = %d, RxDmaIdx = 0x%08x, pSwReadIndex = 0x%08x\n", 
+DebugPrint(TRACE, DBG_MISC, "BthRxPacket ..... GET = %d, RxDmaIdx = 0x%08x, pSwReadIndex = 0x%08x\n",
     GET, RxDmaIdx, *pSwReadIndex);
 
 
@@ -1529,18 +1529,18 @@ int rtbt_pci_isr(IN void *handle)
 	if (!RT_TEST_FLAG(pAd, fRTMP_ADAPTER_INTERRUPT_IN_USE)
 		|| ((IntStatus & IntMask) == 0))
 	{
-DebugPrint(INFO, DBG_INIT, "pAd->Flags=0x%x(%d), IntStatus=0x%x, IntMask=0x%x(0x%x)\n", 
+DebugPrint(INFO, DBG_INIT, "pAd->Flags=0x%x(%d), IntStatus=0x%x, IntMask=0x%x(0x%x)\n",
 		pAd->Flags, RT_TEST_FLAG(pAd, fRTMP_ADAPTER_INTERRUPT_IN_USE),
 		IntStatus, IntMask, IntStatus & IntMask);
 		return -1;
 	}
 
 	//BthDisableInterrupt(pAd);
-	
-	RT_IO_READ32(pAd, INT_SOURCE_CSR, &IntSource.word);  
+
+	RT_IO_READ32(pAd, INT_SOURCE_CSR, &IntSource.word);
 
 DebugPrint(TRACE, DBG_INIT,"***************INT_SOURCE_CSR = %08x\n", IntSource.word);
-    
+
 	if (IntSource.word == 0xffffffff)
 	{
 		//if (!RT_TEST_FLAG(fdoData, fRTMP_ADAPTER_SLEEP_IN_PROGRESS))
@@ -1565,16 +1565,16 @@ DebugPrint(TRACE, DBG_INIT,"***************INT_SOURCE_CSR = %08x\n", IntSource.w
 	if (IntSource.field.RxDone ||IntSource.field.RxDelayDone) {
 
 	DebugPrint(TRACE, DBG_INIT, "RX Done interrupt comming... \n");
-        
+
 		BthHandleRecvInterrupt(pAd);
 	}
-	
+
 	if (IntSource.field.McuCmdInt) {
-     _rtbth_us_event_notification(pAd, INT_MCUCMD_EVENT);  
+     _rtbth_us_event_notification(pAd, INT_MCUCMD_EVENT);
     }
 
 	if (IntSource.field.McuEvtInt) {
-     _rtbth_us_event_notification(pAd, INT_MCUEVT_EVENT);  
+     _rtbth_us_event_notification(pAd, INT_MCUEVT_EVENT);
 	}
 
 	if (IntSource.field.LmpTmr0Int) {
@@ -1592,8 +1592,8 @@ DebugPrint(TRACE, DBG_INIT,"***************INT_SOURCE_CSR = %08x\n", IntSource.w
 	}
 
 	if (IntSource.field.McuFErrorInt) {
-        _rtbth_us_event_notification(pAd, INT_LMPTMR_EVENT);  
-        _rtbth_us_event_notification(pAd, INT_LMPERR_EVENT);  
+        _rtbth_us_event_notification(pAd, INT_LMPTMR_EVENT);
+        _rtbth_us_event_notification(pAd, INT_LMPERR_EVENT);
 	}
 
 
@@ -1611,7 +1611,7 @@ int rtbt_pci_resource_deinit(struct rtbt_os_ctrl *os_ctrl)
 
 DebugPrint(TRACE, DBG_MISC, "-->%s()\n", __FUNCTION__);
 
-	pAd = (RTBTH_ADAPTER *)os_ctrl->dev_ctrl;	
+	pAd = (RTBTH_ADAPTER *)os_ctrl->dev_ctrl;
 	BthFreeRfd(pAd);
 
 DebugPrint(TRACE, DBG_MISC, "<--%s()\n", __FUNCTION__);
@@ -1646,7 +1646,7 @@ DebugPrint(TRACE, DBG_MISC, "-->%s()\n", __FUNCTION__);
 
 	reg_dump_txdesc(pAd);
 	reg_dump_rxdesc(pAd);
-	
+
 DebugPrint(TRACE, DBG_MISC, "<--%s()\n", __FUNCTION__);
 
 	return 0;
