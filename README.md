@@ -6,8 +6,7 @@ This module has no official support by Mediatek. Support was discontinued.
 
 ### Usage: ###
 
-```
-#!Bash
+```sh
 # Init
 sudo modprobe rtbth
 sudo rfkill unblock bluetooth
