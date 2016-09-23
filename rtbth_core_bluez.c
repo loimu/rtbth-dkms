@@ -237,12 +237,13 @@ int rtbt_hci_dev_open(struct hci_dev *hdev)
 {
 	int status = -EBUSY;
 	struct rtbt_os_ctrl *os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hdev);
-	//struct rtbt_hps_ops *hps_ops;
 
 	printk("-->%s()\n", __FUNCTION__);
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,4,0)
 	if (test_bit(HCI_RUNNING, &hdev->flags))
 		return 0;
+#endif
 
 	if (os_ctrl && os_ctrl->hps_ops && os_ctrl->hps_ops->open)
 		status = os_ctrl->hps_ops->open(os_ctrl->dev_ctrl);
@@ -273,12 +274,10 @@ int rtbt_hci_dev_close(struct hci_dev *hdev)
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,4,0)
 	if (!test_and_clear_bit(HCI_RUNNING, &(hdev->flags))){
-#else
-	if (!test_bit(HCI_RUNNING, &(hdev->flags))){
-#endif
 		printk("%s():Directly return due to hdev->flags=0x%lx\n", __FUNCTION__, hdev->flags);
 		return 0;
 	}
+#endif
 
 	rtbt_hci_dev_flush(hdev);
 
