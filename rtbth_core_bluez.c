@@ -92,9 +92,14 @@ int rtbt_hci_dev_flush(struct hci_dev *hdev)
 static const char *pkt_type_str[]=
 	{"UNKNOWN", "HCI_CMD", "ACL_DATA", "SCO_DATA", "HCI_EVENT", "HCI_VENDOR", "ERROR_TYPE"};
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,11,0)
 int rtbt_hci_dev_send(struct hci_dev *hdev, struct sk_buff *skb)
 {
-	//struct hci_dev *hdev = (struct hci_dev *)skb->dev;
+#else
+int rtbt_hci_dev_send(struct sk_buff *skb)
+{
+    struct hci_dev *hdev = (struct hci_dev *)skb->dev;
+#endif
 	struct rtbt_os_ctrl *os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hdev);
 	struct rtbt_hps_ops *hps_ops;
 	unsigned char pkt_type;
@@ -226,7 +231,11 @@ if (pkt_type == HCI_SCODATA_PKT)
         hdev->stat.byte_rx += len;
     }
 
-	status = hci_recv_frame(hdev,skb);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,11,0)
+	status = hci_recv_frame(hdev, skb);
+#else
+	status = hci_recv_frame(skb);
+#endif
 
 //printk("<--%s()\n", __FUNCTION__);
 
@@ -427,7 +436,9 @@ g_hdev=hdev;
 	hdev->flush = rtbt_hci_dev_flush;
 	hdev->send = rtbt_hci_dev_send;
 //	hdev->destruct = rtbt_hci_dev_destruct;
-//	hdev->ioctl = rtbt_hci_dev_ioctl;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0)
+	hdev->ioctl = rtbt_hci_dev_ioctl;
+#endif
 //	hdev->owner = THIS_MODULE;
 
 	printk("<--%s():alloc hdev(0x%lx) done\n", __FUNCTION__, (ULONG)hdev);
