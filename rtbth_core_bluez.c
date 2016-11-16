@@ -25,7 +25,6 @@
 *************************************************************************/
 
 #include <linux/pci.h>
-#include <linux/errno.h>
 #include "rt_linux.h"
 #include "hps_bluez.h"
 #include "rtbt_osabl.h"
@@ -150,7 +149,7 @@ int rtbt_hci_dev_send(struct sk_buff *skb)
 
 		case HCI_SCODATA_PKT:
 			printk("-->%s():sco len=%d,time=0x%lx\n", __FUNCTION__, skb->len, jiffies);
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 0, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)
 			os_ctrl->sco_tx_seq = bt_cb(skb)->l2cap.txseq;
 #else
 			os_ctrl->sco_tx_seq = bt_cb(skb)->control.txseq;
@@ -407,13 +406,13 @@ int rtbt_hps_iface_init(
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,34)
 				hdev->bus = HCI_PCI;
+#else
+				hdev->type = HCI_PCI;
+#endif
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,8,0)
 				hdev->dev_type = HCI_PRIMARY;
 #else
 				hdev->dev_type = HCI_BREDR;
-#endif
-#else
-				hdev->type = HCI_PCI;
 #endif
 				pci_set_drvdata(pcidev, hdev);
 				SET_HCIDEV_DEV(hdev, &pcidev->dev);
