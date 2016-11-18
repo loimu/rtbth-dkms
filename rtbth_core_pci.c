@@ -343,7 +343,11 @@ BthIsr(int irq, void *dev_instance, struct pt_regs *regs)
 	}
 
 	if (hdev){
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
 		os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hdev);
+#else
+        os_ctrl = (struct rtbt_os_ctrl *)hdev->driver_data;
+#endif
 		ASSERT(os_ctrl);
 		if (os_ctrl && os_ctrl->if_ops.pci_ops.isr) {
 			retval = (os_ctrl->if_ops.pci_ops.isr)(os_ctrl->dev_ctrl);
