@@ -1309,8 +1309,8 @@ VOID RtbtResetPDMA(IN RTBTH_ADAPTER *pAd)
 	}
 
 DebugPrint(TRACE, DBG_MISC, "%s():dump tx/rx desc register value\n", __FUNCTION__);
-	reg_dump_txdesc(pAd);
-	reg_dump_rxdesc(pAd);
+	//reg_dump_txdesc(pAd); // muted debug output
+	//reg_dump_rxdesc(pAd); // here too
 DebugPrint(TRACE, DBG_MISC, "<--%s()\n", __FUNCTION__);
 }
 
@@ -1660,8 +1660,8 @@ DebugPrint(TRACE, DBG_MISC, "-->%s()\n", __FUNCTION__);
 		goto fail;
 	}
 
-	reg_dump_txdesc(pAd);
-	reg_dump_rxdesc(pAd);
+	//reg_dump_txdesc(pAd); // muted debug output
+	//reg_dump_rxdesc(pAd); // here too
 
 DebugPrint(TRACE, DBG_MISC, "<--%s()\n", __FUNCTION__);
 
