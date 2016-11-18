@@ -328,7 +328,11 @@ int rtbt_hps_iface_detach(IN struct rtbt_os_ctrl *os_ctrl)
 
 	printk("--->%s()\n", __FUNCTION__);
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     hci_dev_hold(hdev);
+#else
+    __hci_dev_hold(hdev);
+#endif
 
     //rtbt_hci_dev_close(hciDev);
 	/* un-register HCI device */
@@ -341,7 +345,12 @@ int rtbt_hps_iface_detach(IN struct rtbt_os_ctrl *os_ctrl)
 		printk("Can't unregister HCI device %s\n", hdev->name);
 */
     hci_unregister_dev(hdev);
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     hci_dev_put(hdev);
+#else
+    __hci_dev_put(hdev);
+#endif
 
 	printk("<---%s():Success\n", __FUNCTION__);
 	return 0;
@@ -353,7 +362,11 @@ int rtbt_hps_iface_attach(IN struct rtbt_os_ctrl *os_ctrl)
 
 	printk("--->%s()\n", __FUNCTION__);
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     hci_dev_hold(hdev);
+#else
+    __hci_dev_hold(hdev);
+#endif
 
 	/* Register HCI device */
 	if (hci_register_dev(hdev) < 0) {
@@ -361,7 +374,11 @@ int rtbt_hps_iface_attach(IN struct rtbt_os_ctrl *os_ctrl)
 		return -ENODEV;
 	}
 
-	hci_dev_put(hdev);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
+    hci_dev_put(hdev);
+#else
+    __hci_dev_put(hdev);
+#endif
 
 	printk("<---%s():Success\n", __FUNCTION__);
 	return 0;
