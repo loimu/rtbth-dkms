@@ -28,7 +28,7 @@
 #include "hps_bluez.h"
 #include "rtbth_us.h"
 
-#define PKT_HV3_MAX_DATA_LEN 30UL 
+#define PKT_HV3_MAX_DATA_LEN 30UL
 
 extern RTBTH_ADAPTER *gpAd;
 static struct rtbt_hps_ops rtbt_3298_hps_ops;
@@ -828,7 +828,7 @@ int rtbt_prom_read16(
     *pData = ShiftInBits(pAd);
 
     EEpromCleanup(pAd);
-		
+
     return 0;
 }
 
@@ -909,7 +909,7 @@ USHORT Bth_EEPROM_READ16(
 
 	value &= (~0x80000000);
 	RT_IO_WRITE32(pAd, WLAN_FUN_INFO, value);
-	
+
 	return data;
 }
 
@@ -957,14 +957,14 @@ VOID dump_mac_reg(IN RTBTH_ADAPTER *pAd)
 	UINT32 mac_val;
 //	UINT32 mac_reg; //sean wang linux: warning: unused variable ‘mac_reg’
 	int cnt;
-	
+
 	DebugPrint(TRACE, DBG_MISC, "Dump Mac Registers:\n");
 	for (cnt = 0; cnt < sizeof(RT3298_REG_ADDR)/sizeof(UINT32);)
 	{
 		RT_IO_FORCE_READ32(pAd, RT3298_REG_ADDR[cnt], &mac_val);
-		DebugPrint(TRACE, DBG_MISC, "0x%x=0x%x\t", RT3298_REG_ADDR[cnt], mac_val);	
+		DebugPrint(TRACE, DBG_MISC, "0x%x=0x%x\t", RT3298_REG_ADDR[cnt], mac_val);
 		if (((++cnt) % 4) == 0)
-			DebugPrint(TRACE, DBG_MISC, "\n");				
+			DebugPrint(TRACE, DBG_MISC, "\n");
 	}
 	DebugPrint(TRACE, DBG_MISC, "\n-------\n");
 }
@@ -999,16 +999,16 @@ dump_mac_reg(pAd);
 
 	//Enable ROSC_EN first then CAL_REQ
 	RT_IO_READ32(pAd, OSCCTL, &osCtrl.word);
-	osCtrl.field.ROSC_EN = TRUE; //HW force 
-	RT_IO_WRITE32(pAd, OSCCTL, osCtrl.word);   
+	osCtrl.field.ROSC_EN = TRUE; //HW force
+	RT_IO_WRITE32(pAd, OSCCTL, osCtrl.word);
 
-	osCtrl.field.ROSC_EN = TRUE; //HW force 
+	osCtrl.field.ROSC_EN = TRUE; //HW force
 	osCtrl.field.CAL_REQ = TRUE;
 	osCtrl.field.REF_CYCLE = 0x27;
-	RT_IO_WRITE32(pAd, OSCCTL, osCtrl.word);   
+	RT_IO_WRITE32(pAd, OSCCTL, osCtrl.word);
 
 	RT_IO_READ32(pAd, BT_FUN_CTRL, &pAd->btFunCtrl.word);
-	
+
 	/* Initialize bUseEfuse before any eeprom r/w */
 	eFuseCtrl.word = 0;
 	RT_IO_READ32(pAd, EFUSE_CTRL, &eFuseCtrl.word);
@@ -1023,8 +1023,7 @@ dump_mac_reg(pAd);
 		RT_IO_READ32(pAd, ASIC_VER_CSR, &pAd->MACVersion);
 		if ((pAd->MACVersion != 0x00) && (pAd->MACVersion != 0xFFFFFFFF))
 			break;
-
-			KeStallExecutionProcessor(5);
+		KeStallExecutionProcessor(5);
 	} while (Index++ < 10);
 	DebugPrint(TRACE, DBG_INIT, "PCI ASIC Ver [0x%08x]\n", pAd->MACVersion);
 
@@ -1082,10 +1081,10 @@ dump_mac_reg(pAd);
 		//init default value
 		pAd->bHwRadio = TRUE;
 	}
-#endif    
-	pAd->bRadio = TRUE;	
+#endif
+	pAd->bRadio = TRUE;
 	Rtbth_Set_Radio_Led(pAd, TRUE);
-	
+
 	// Disable DMA.
 	BthDmaCfg(pAd, 0);
 
@@ -1119,16 +1118,16 @@ int BthInitialize(
 	BthInitializePrerequire(pAd);
 
 	RT_SET_FLAG(pAd, fRTMP_ADAPTER_INTERRUPT_IN_USE);
-	
+
 	status = BthInitializeAdapter(pAd);
 	if (!NT_SUCCESS(status))
 	{
 		DebugPrint(ERROR, DBG_INIT, "BthInitializeAdapter failed: 0x%x\n", status);
 		return status;
 	}
-    	
+
     _rtbth_us_event_notification(pAd, INIT_CORESTART_EVENT);
-     
+
 DebugPrint(TRACE, DBG_INIT, "%s():status=%d\n", __FUNCTION__, status);
 	return status;
 }
@@ -1140,7 +1139,7 @@ void BthEnableRxTx(IN RTBTH_ADAPTER *pAd)
 	//LARGE_INTEGER delay;
 	UCHAR   		i, j;
 	UINT8			TxRingSize;
-	
+
 	DebugPrint(TRACE, DBG_INIT, "==> BthEnableRxTx\n");
 
 	BthDmaCfg(pAd, 1);
@@ -1211,10 +1210,10 @@ VOID BthRadioOff(
 	IN	PRTBTH_ADAPTER pAd)
 {
 	ULONG   	MacValue;
-	
+
 	//ask by max ,don't touch app_clk_req at B version IC
 	// per Max's request, leave bit[2](BT_RF_EN) on, to fix Ch 13 issue
-	pAd->btFunCtrl.word &= ~(0x1);	
+	pAd->btFunCtrl.word &= ~(0x1);
 	//
 	// Reset the whole bluetooth(PMDA, LC, MCU, ...) except RF
 	//
@@ -1245,7 +1244,7 @@ VOID BthRadioOn(
 		pAd->btFunCtrl.word |=0x5;
 		pAd->btFunCtrl.word &= (~0x2);
 	}
-    
+
 	do
 	{
 		// Check PLL stable.
@@ -1303,13 +1302,13 @@ int rtbt_dev_ctrl_deinit(struct rtbt_os_ctrl *os_ctrl)
 	RTBTH_ADAPTER *pAd;;
 
 	ASSERT(os_ctrl);
-	
+
 	pAd = (RTBTH_ADAPTER *)(os_ctrl->dev_ctrl);
 	if (!pAd) {
 		DebugPrint(FATAL, DBG_MISC, "%s():Fatal Error, os_ctrl=0x%x\n", __FUNCTION__, os_ctrl);
 		return -1;
 	}
-	
+
 	/* de-initialize list heads, spinlocks, timers etc. */
 	ral_spin_deinit(&pAd->SendLock);
 	ral_spin_deinit(&pAd->RcvLock);
@@ -1329,7 +1328,7 @@ int rtbt_dev_ctrl_deinit(struct rtbt_os_ctrl *os_ctrl)
 
 	KeFreeTimer(&pAd->RadioStateTimer);
 	KeFreeTimer(&pAd->core_idle_timer);
-	
+
 	if (pAd->os_ctrl)
 		ral_mem_vfree(pAd->os_ctrl);
 
@@ -1347,9 +1346,9 @@ int rtbt_dev_ctrl_init(
 	int size;
 	int spin_status = 0, timer_status = 0;
 	NDIS_STATUS event_status = STATUS_SUCCESS;
-	
+
 //	size = sizeof(struct rtbt_dev_ctrl) + sizeof(struct rtbt_os_ctrl); //sean wang linux
-//_RTBTH_ADAPTER	
+//_RTBTH_ADAPTER
 	size = sizeof(struct _RTBTH_ADAPTER) + sizeof(struct rtbt_os_ctrl);	//sean wang linux
 
 	mem = ral_mem_valloc(size);
@@ -1362,21 +1361,21 @@ int rtbt_dev_ctrl_init(
 
 	os_ctrl = (struct rtbt_os_ctrl *)mem;
 	//pAd = (struct rtbt_dev_ctrl *)(mem + sizeof(struct rtbt_os_ctrl));
-	pAd = (struct _RTBTH_ADAPTER *)(mem + sizeof(struct rtbt_os_ctrl));	
+	pAd = (struct _RTBTH_ADAPTER *)(mem + sizeof(struct rtbt_os_ctrl));
 
 	DebugPrint(TRACE, DBG_INIT,
 				"Alloc os_ctrl@0x%lx(%d), dev_ctrl@0x%lx(%d), len=%d\n",
 				(ULONG)os_ctrl, sizeof(struct rtbt_os_ctrl),
 				(ULONG)pAd, sizeof(struct _RTBTH_ADAPTER), size);//sean wang linux
-	
+
 	os_ctrl->dev_ctrl = (void *)pAd;
 	os_ctrl->if_ops.pci_ops.isr = rtbt_pci_isr;
 	os_ctrl->if_ops.pci_ops.csr_addr = csr;
 	os_ctrl->hps_ops = &rtbt_3298_hps_ops;
-	
+
 	pAd->CSRAddress = csr;
 	pAd->os_ctrl = os_ctrl;
-	
+
 #ifdef DBG
 	DebugPrint(TRACE, DBG_INIT, "os_ctrl.if_ops.pci_ops.isr=0x%lx(0x%lx), "
 				"csr_addr=0x%lx(0x%lx)\n",
@@ -1388,18 +1387,18 @@ int rtbt_dev_ctrl_init(
 	spin_status |= ral_spin_init(&pAd->SendLock);
 	spin_status |= ral_spin_init(&pAd->RcvLock);
     spin_status |= ral_spin_init(&pAd->scoSpinLock);
-    
+
 	RtlCopyMemory(&pAd->infName[0], "RalinkBT", 8);
 
 	if (spin_status | event_status | timer_status) {
-		DebugPrint(ERROR, DBG_INIT, "%s():Init failed(spin=%d, event=%d, timer=%d)\n", 
+		DebugPrint(ERROR, DBG_INIT, "%s():Init failed(spin=%d, event=%d, timer=%d)\n",
 					__FUNCTION__, spin_status, event_status, timer_status);
 		rtbt_dev_ctrl_deinit(os_ctrl);
 		return -1;
 	}
-	
+
 	*pDevCtrl = os_ctrl;
-	
+
 	return 0;
 }
 
@@ -1431,7 +1430,7 @@ static struct rtbt_dev_entry rtbt_3298_dev_list={
 struct rtbt_dev_entry *rtbt_3298_init(void)
 {
 	DebugPrint(TRACE, DBG_INIT, "--->%s()\n", __FUNCTION__);
-	
+
 	return &rtbt_3298_dev_list;
 }
 
@@ -1456,7 +1455,7 @@ VOID BthShutdown(
 }
 
 INT rtbt_hps_suspend(void *pDevCtrl){
-    
+
 //    RTBTH_ADAPTER *pAd = (RTBTH_ADAPTER *)pDevCtrl;
 //    struct rtbt_os_ctrl *os_ctrl;
 
@@ -1469,7 +1468,7 @@ return 1;
     //
 
     printk("--->%s, before rtbt_hps_iface_detach\n", __FUNCTION__);
-    //msleep(3000);    
+    //msleep(3000);
   //  rtbt_hps_iface_detach(os_ctrl);
     printk("--->%s, after rtbt_hps_iface_detach\n", __FUNCTION__);
     //
@@ -1486,7 +1485,7 @@ return 1;
     _rtbth_us_event_notification(pAd, INIT_CORESTOP_EVENT);
 
     //ExDeleteNPagedLookasideList(&FdoData->HCIDataLookasideList);
-    
+
     RtmpOSIRQRelease(os_ctrl->if_dev, os_ctrl->bt_dev);
 
     if (pAd->sco_event_buf)
@@ -1504,11 +1503,11 @@ return 1;
 
     return STATUS_SUCCESS;
 #endif
-    
+
 }
 
 INT rtbt_hps_resume(void *pDevCtrl){
- return 1;  
+ return 1;
 
  #if 0
     int status;
@@ -1522,7 +1521,7 @@ INT rtbt_hps_resume(void *pDevCtrl){
     //
     DebugPrint(TRACE, DBG_INIT, "-->%s()\n", __FUNCTION__);
     pAd->sco_event_buf = ral_mem_alloc(128 * 4, RAL_MEM_NORMAL);
-  
+
     pAd->sco_data_buf = ral_mem_alloc( PKT_HV3_MAX_DATA_LEN * 2 + 3, RAL_MEM_NORMAL);
 
     status = BthInitialize(pAd);
@@ -1540,7 +1539,7 @@ INT rtbt_hps_resume(void *pDevCtrl){
     //	return status;
     BthEnableInterrupt(pAd);
     BthEnableRxTx(pAd);
-    
+
     //
     // attached the blue-z core.
     //
@@ -1548,7 +1547,7 @@ INT rtbt_hps_resume(void *pDevCtrl){
 
     return status;
 #endif
-    
+
 }
 
 INT rtbt_hps_open(void *pDevCtrl)
@@ -1582,7 +1581,7 @@ INT rtbt_hps_open(void *pDevCtrl)
 
 	DebugPrint(TRACE, DBG_INIT, "BthEnableInterrupt \n");
 //	DebugPrint(TRACE, DBG_THREAD, "Shiang: Here we stop the rtbt_hps_open!Remove it latter(status=%d)!\n", status);
-//	return status;	
+//	return status;
 	BthEnableInterrupt(pAd);
 	BthEnableRxTx(pAd);
 
@@ -1591,25 +1590,25 @@ INT rtbt_hps_open(void *pDevCtrl)
 
 
 INT rtbt_hps_close(void *pDevCtrl)
-{	
+{
 	RTBTH_ADAPTER *pAd = (RTBTH_ADAPTER *)pDevCtrl;
 	struct rtbt_os_ctrl *os_ctrl;
-	
+
 	DebugPrint(TRACE, DBG_MISC, "PciDrvReturnResources\n");
 
 	/* Reset and put the device into a known initial state. */
 	RT_CLEAR_FLAG(pAd, fRTMP_ADAPTER_INTERRUPT_IN_USE);
-	
+
 	BthShutdown(pAd);
-    
+
     _rtbth_us_event_notification(pAd, INIT_CORESTOP_EVENT);
 
 	os_ctrl = pAd->os_ctrl;
 	RtmpOSIRQRelease(os_ctrl->if_dev, os_ctrl->bt_dev);
-	
+
 	if (pAd->sco_event_buf)
 		ral_mem_free(pAd->sco_event_buf);
-	
+
 	if (pAd->sco_data_buf)
 		ral_mem_free(pAd->sco_data_buf);
 	/* Disconnect from the interrupt and unmap any I/O ports */
@@ -1631,8 +1630,8 @@ INT rtbt_hps_close(void *pDevCtrl)
 int rtbth_rx_packet(void *pdata, RXBI_STRUC rxbi, void *buf, unsigned int len){
 
     unsigned char delimiter[] = {0xcc, 0xcc};
-    unsigned int  sz_need = 2 + 
-                            sizeof(rxbi) + 
+    unsigned int  sz_need = 2 +
+                            sizeof(rxbi) +
                             sizeof(len)  +
                             len;
     int ret = 0;
@@ -1640,11 +1639,11 @@ int rtbth_rx_packet(void *pdata, RXBI_STRUC rxbi, void *buf, unsigned int len){
 
 
     DebugPrint(TRACE, DBG_INIT, "\n **sz_need for rx=%d, kfifo_avail(rx)=%d\n", sz_need, kfifo_avail(gpAd->rx_fifo));
-    
+
     DebugPrint(TRACE, DBG_INIT,"#########Rx Data len = %d, rxbi.len=%d, rxbi.crc = %d, rxbi.ptt=%d \n", len, rxbi.Len, rxbi.Crc, rxbi.Ptt);
-  
-    spin_lock_irqsave(&gpAd->rx_fifo_lock, cpuflags);    
-    if(kfifo_avail(gpAd->rx_fifo) > sz_need) {              
+
+    spin_lock_irqsave(&gpAd->rx_fifo_lock, cpuflags);
+    if(kfifo_avail(gpAd->rx_fifo) > sz_need) {
         kfifo_in(gpAd->rx_fifo, &delimiter[0] , sizeof(delimiter));
         kfifo_in(gpAd->rx_fifo, &rxbi, sizeof(rxbi));
         kfifo_in(gpAd->rx_fifo, &len, sizeof(len));
@@ -1653,11 +1652,11 @@ int rtbth_rx_packet(void *pdata, RXBI_STRUC rxbi, void *buf, unsigned int len){
         DebugPrint(ERROR, DBG_INIT, "\n room of rx fifo is not available\n");
         ret = -1;
     }
-    DebugPrint(TRACE, DBG_INIT, "\n **after rx data in , kfifo_len (%d), sz_need(%d), sizeof(rxbi)=%d, sizeof(len)=%d \n", 
+    DebugPrint(TRACE, DBG_INIT, "\n **after rx data in , kfifo_len (%d), sz_need(%d), sizeof(rxbi)=%d, sizeof(len)=%d \n",
         kfifo_len(gpAd->rx_fifo), sz_need,  sizeof(rxbi),  sizeof(len)  );
-    
+
     spin_unlock_irqrestore(&gpAd->rx_fifo_lock, cpuflags);
-    
+
     //notify
     _rtbth_us_event_notification(gpAd, INT_RX_EVENT);
 
@@ -1667,14 +1666,14 @@ int rtbth_rx_packet(void *pdata, RXBI_STRUC rxbi, void *buf, unsigned int len){
 
 int rtbth_bz_hci_send(void *pdata, void *buf, unsigned long len){
 
-    //hci enqueue 
+    //hci enqueue
     unsigned char delimiter[] = {0xcc, 0xcc};
     unsigned int  sz_need = 2 + 4 + len;
     int ret = 0;
     unsigned long cpuflags;
-    
-    spin_lock_irqsave(&gpAd->hci_fifo_lock,cpuflags);    
-    if(kfifo_avail(gpAd->hci_fifo) > sz_need) {              
+
+    spin_lock_irqsave(&gpAd->hci_fifo_lock,cpuflags);
+    if(kfifo_avail(gpAd->hci_fifo) > sz_need) {
         kfifo_in(gpAd->hci_fifo, &delimiter[0] , sizeof(delimiter));
         kfifo_in(gpAd->hci_fifo, &len, sizeof(len));
         kfifo_in(gpAd->hci_fifo, buf, len);
@@ -1682,7 +1681,7 @@ int rtbth_bz_hci_send(void *pdata, void *buf, unsigned long len){
         DebugPrint(ERROR, DBG_INIT, "\n room of bz_hci fifo is not available\n");
         ret = -1;
     }
-    
+
     DebugPrint(TRACE, DBG_INIT, "\n after hci data in , kfifo_len (%d) \n", kfifo_len(gpAd->hci_fifo));
     spin_unlock_irqrestore(&gpAd->hci_fifo_lock,cpuflags);
 
@@ -1700,9 +1699,9 @@ int rtbth_bz_acl_send(void *pdata, void *buf, unsigned long len){
     int ret = 0;
     unsigned long cpuflags;
 
-    spin_lock_irqsave(&gpAd->acl_fifo_lock, cpuflags);    
+    spin_lock_irqsave(&gpAd->acl_fifo_lock, cpuflags);
     //acl enqueue
-    if(kfifo_avail(gpAd->acl_fifo) > sz_need) {              
+    if(kfifo_avail(gpAd->acl_fifo) > sz_need) {
         kfifo_in(gpAd->acl_fifo, &delimiter[0] , sizeof(delimiter));
         kfifo_in(gpAd->acl_fifo, &len, sizeof(len));
         kfifo_in(gpAd->acl_fifo, buf, len);
@@ -1712,7 +1711,7 @@ int rtbth_bz_acl_send(void *pdata, void *buf, unsigned long len){
     }
     DebugPrint(TRACE, DBG_INIT, "\n after acl data in , kfifo_len (%d) \n", kfifo_len(gpAd->acl_fifo));
     spin_unlock_irqrestore(&gpAd->acl_fifo_lock,cpuflags);
-    
+
     //notify
     _rtbth_us_event_notification(gpAd, BZ_ACL_EVENT);
 
@@ -1726,9 +1725,9 @@ int rtbth_bz_sco_send(void *pdata, void *buf, unsigned long len){
     int ret = 0;
     unsigned long cpuflags;
 
-    spin_lock_irqsave(&gpAd->sco_fifo_lock,cpuflags);    
+    spin_lock_irqsave(&gpAd->sco_fifo_lock,cpuflags);
     //sco enqueue
-    if(kfifo_avail(gpAd->sco_fifo) > sz_need) {              
+    if(kfifo_avail(gpAd->sco_fifo) > sz_need) {
         kfifo_in(gpAd->sco_fifo, &delimiter[0] , sizeof(delimiter));
         kfifo_in(gpAd->sco_fifo, &len, sizeof(len));
         kfifo_in(gpAd->sco_fifo, buf, len);
@@ -1744,7 +1743,7 @@ int rtbth_bz_sco_send(void *pdata, void *buf, unsigned long len){
 
     return ret;
 }
-	
+
 static struct rtbt_hps_ops rtbt_3298_hps_ops = {
     .open = rtbt_hps_open,
 	.close = rtbt_hps_close,
@@ -1752,5 +1751,5 @@ static struct rtbt_hps_ops rtbt_3298_hps_ops = {
 	.resume =  rtbt_hps_resume,
     .hci_cmd = rtbth_bz_hci_send,
 	.hci_acl_data = rtbth_bz_acl_send,
-	.hci_sco_data = rtbth_bz_sco_send,	
+	.hci_sco_data = rtbth_bz_sco_send,
 };
