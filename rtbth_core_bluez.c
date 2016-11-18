@@ -105,9 +105,6 @@ int rtbt_hci_dev_send(struct sk_buff *skb)
 	unsigned char pkt_type;
 	int status;
 
-
-	//printk("-->%s():\n", __FUNCTION__);
-
 	pkt_type = rtbt_get_pkt_type(skb);
 	//printk("hciName:%s type:%s(%d) len:%d\n",
 	//		hdev->name, pkt_type_str[pkt_type],
@@ -308,18 +305,14 @@ int rtbt_hci_dev_close(struct hci_dev *hdev)
 int rtbt_hps_iface_suspend(IN struct rtbt_os_ctrl *os_ctrl)
 {
     struct hci_dev *hdev = os_ctrl->bt_dev;
-
     hci_suspend_dev(hdev);
-
     return 0;
 }
 
 int rtbt_hps_iface_resume(IN struct rtbt_os_ctrl *os_ctrl)
 {
     struct hci_dev *hdev = os_ctrl->bt_dev;
-
     hci_resume_dev(hdev);
-
     return 0;
 }
 
@@ -335,16 +328,11 @@ int rtbt_hps_iface_detach(IN struct rtbt_os_ctrl *os_ctrl)
     __hci_dev_hold(hdev);
 #endif
 
-    //rtbt_hci_dev_close(hciDev);
-	/* un-register HCI device */
-	if (!hdev) {
-		printk("%s():os_ctrl(%p)->bt_dev is NULL\n", __FUNCTION__, os_ctrl);
-		return -1;
-	}
-
-	/*if (hci_unregister_dev(hdev) < 0)
-		printk("Can't unregister HCI device %s\n", hdev->name);
-*/
+    /* un-register HCI device */
+    if (!hdev) {
+        printk("%s():os_ctrl(%p)->bt_dev is NULL\n", __FUNCTION__, os_ctrl);
+        return -1;
+    }
     hci_unregister_dev(hdev);
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
