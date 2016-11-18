@@ -151,9 +151,11 @@ int rtbt_hci_dev_send(struct sk_buff *skb)
 		case HCI_SCODATA_PKT:
 			printk("-->%s():sco len=%d,time=0x%lx\n", __FUNCTION__, skb->len, jiffies);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)
-			os_ctrl->sco_tx_seq = bt_cb(skb)->l2cap.txseq;
+            os_ctrl->sco_tx_seq = bt_cb(skb)->l2cap.txseq;
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+            os_ctrl->sco_tx_seq = bt_cb(skb)->control.txseq;
 #else
-			os_ctrl->sco_tx_seq = bt_cb(skb)->control.txseq;
+            os_ctrl->sco_tx_seq = bt_cb(skb)->tx_seq;
 #endif
 			os_ctrl->sco_time_hci = jiffies;
 
