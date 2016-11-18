@@ -57,30 +57,27 @@ static inline void rtbt_set_pkt_type(struct sk_buff *skb, unsigned char type)
 #endif
 }
 
-
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0)
 int rtbt_hci_dev_ioctl(struct hci_dev *hdev, unsigned int cmd, unsigned long arg)
 {
-	printk("%s(dev=0x%lx): ioctl cmd=0x%x!\n",
-			__FUNCTION__, (ULONG)hdev, cmd);
-
+	printk("%s(dev=0x%lx): ioctl cmd=0x%x!\n", __FUNCTION__, (ULONG)hdev, cmd);
 	return -ENOIOCTLCMD;
 }
+#endif
 
 void rtbt_hci_dev_notify(struct hci_dev *hdev, unsigned int evt)
 {
-	printk("%s(dev=0x%lx): evt=0x%x!\n",
-			__FUNCTION__, (ULONG)hdev, evt);
+	printk("%s(dev=0x%lx): evt=0x%x!\n", __FUNCTION__, (ULONG)hdev, evt);
 	return;
 }
 
-
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0)
 void rtbt_hci_dev_destruct(struct hci_dev *hdev)
 {
 	printk("-->%s(): dev=0x%lx!\n", __FUNCTION__, (ULONG)hdev);
-
 	return;
 }
-
+#endif
 
 int rtbt_hci_dev_flush(struct hci_dev *hdev)
 {
@@ -424,7 +421,7 @@ int rtbt_hps_iface_init(
 			hci_free_dev(hdev);
 			return -1;
 	}
-g_hdev=hdev;
+	g_hdev = hdev;
 	os_ctrl->bt_dev = hdev;
 	os_ctrl->if_dev = if_dev;
 	os_ctrl->hps_ops->recv = rtbt_hci_dev_receive;
@@ -434,14 +431,16 @@ g_hdev=hdev;
 	hdev->close = rtbt_hci_dev_close;
 	hdev->flush = rtbt_hci_dev_flush;
 	hdev->send = rtbt_hci_dev_send;
-//	hdev->destruct = rtbt_hci_dev_destruct;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0)
+	hdev->destruct = rtbt_hci_dev_destruct;
+#endif
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0)
 	hdev->ioctl = rtbt_hci_dev_ioctl;
 #endif
-//	hdev->owner = THIS_MODULE;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0)
+	hdev->owner = THIS_MODULE;
+#endif
 
 	printk("<--%s():alloc hdev(0x%lx) done\n", __FUNCTION__, (ULONG)hdev);
-
 	return 0;
 }
-
