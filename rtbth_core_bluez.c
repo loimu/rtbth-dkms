@@ -57,7 +57,7 @@ static inline void rtbt_set_pkt_type(struct sk_buff *skb, unsigned char type)
 #endif
 }
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,13,0)
 int rtbt_hci_dev_ioctl(struct hci_dev *hdev, unsigned int cmd, unsigned long arg)
 {
 	printk("%s(dev=0x%lx): ioctl cmd=0x%x!\n", __FUNCTION__, (ULONG)hdev, cmd);
@@ -88,7 +88,7 @@ int rtbt_hci_dev_flush(struct hci_dev *hdev)
 static const char *pkt_type_str[]=
 	{"UNKNOWN", "HCI_CMD", "ACL_DATA", "SCO_DATA", "HCI_EVENT", "HCI_VENDOR", "ERROR_TYPE"};
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,11,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,13,0)
 int rtbt_hci_dev_send(struct hci_dev *hdev, struct sk_buff *skb)
 {
 #else
@@ -231,13 +231,12 @@ if (pkt_type == HCI_SCODATA_PKT)
         hdev->stat.byte_rx += len;
     }
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,11,0)
-	status = hci_recv_frame(hdev, skb);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,13,0)
+    status = hci_recv_frame(hdev, skb);
 #else
-	status = hci_recv_frame(skb);
+    status = hci_recv_frame(skb);
 #endif
-
-	return status;
+    return status;
 }
 
 int rtbt_hci_dev_open(struct hci_dev *hdev)
@@ -465,7 +464,7 @@ int rtbt_hps_iface_init(
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0)
 	hdev->destruct = rtbt_hci_dev_destruct;
 #endif
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,13,0)
 	hdev->ioctl = rtbt_hci_dev_ioctl;
 #endif
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0)
