@@ -414,6 +414,7 @@ int rtbt_hps_iface_init(
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0)
     hdev->owner = THIS_MODULE;
 #endif
+    hdev->notify = rtbt_hci_dev_notify;
 
     printk("<--%s():alloc hdev(0x%lx) done\n", __FUNCTION__, (ULONG)hdev);
     return 0;
