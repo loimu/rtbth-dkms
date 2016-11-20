@@ -35,8 +35,9 @@
 #ifdef OS_ABL_SUPPORT
 /* struct pci_device_id *rtbt_pci_ids = NULL; */
 #else
-static struct pci_device_id rtbt_pci_ids[]  = {
+static const struct pci_device_id rtbt_pci_ids[]  = {
 	{PCI_DEVICE(0x1814, 0x3298)},
+	/* do not remove the last entry */
 	{}
 };
 MODULE_DEVICE_TABLE(pci, rtbt_pci_ids);
