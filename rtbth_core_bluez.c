@@ -33,12 +33,10 @@ void *g_hdev = 0;
 
 static inline unsigned char rtbt_get_pkt_type(struct sk_buff *skb)
 {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,14)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,5,0)
     return hci_skb_pkt_type(skb);
-#else
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,14)
     return bt_cb(skb)->pkt_type;
-#endif
 #else
     return skb->pkt_type;
 #endif
@@ -46,12 +44,10 @@ static inline unsigned char rtbt_get_pkt_type(struct sk_buff *skb)
 
 static inline void rtbt_set_pkt_type(struct sk_buff *skb, unsigned char type)
 {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,14)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,5,0)
     hci_skb_pkt_type(skb) = type;
-#else
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,14)
     bt_cb(skb)->pkt_type = type;
-#endif
 #else
     skb->pkt_type = type;
 #endif
@@ -161,6 +157,7 @@ int rtbt_hci_dev_send(struct sk_buff *skb)
         case HCI_VENDOR_PKT:
             break;
     }
+
     if( (hdev!=0) && (status == 0)){
         hdev->stat.byte_tx += skb->len;
     } else {
@@ -388,12 +385,12 @@ int rtbt_hps_iface_init(
                 SET_HCIDEV_DEV(hdev, &pcidev->dev);
             }
             break;
-
         default:
             printk("invalid if_type(%d)!\n", if_type);
             hci_free_dev(hdev);
             return -1;
     }
+
     g_hdev = hdev;
     os_ctrl->bt_dev = hdev;
     os_ctrl->if_dev = if_dev;
