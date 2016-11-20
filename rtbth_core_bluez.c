@@ -85,8 +85,8 @@ int rtbt_hci_dev_flush(struct hci_dev *hdev)
     return 0;
 }
 
-static const char *pkt_type_str[]= {"UNKNOWN", "HCI_CMD", "ACL_DATA",
-    "SCO_DATA", "HCI_EVENT", "HCI_VENDOR", "ERROR_TYPE"};
+//static const char *pkt_type_str[]= {"UNKNOWN", "HCI_CMD", "ACL_DATA",
+//    "SCO_DATA", "HCI_EVENT", "HCI_VENDOR", "ERROR_TYPE"};
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,13,0)
 int rtbt_hci_dev_send(struct hci_dev *hdev, struct sk_buff *skb)
@@ -176,7 +176,9 @@ int rtbt_hci_dev_receive(void *bt_dev, int pkt_type, char *buf, int len)
     struct hci_dev *hdev = 0;
     struct sk_buff *skb;
     int status;
-//printk("-->%s(): receive info: pkt_type=%d(%s), len=%d!\n", __FUNCTION__, pkt_type, pkt_type <= 5 ? pkt_type_str[pkt_type] : "ErrPktType", len);
+
+    //printk("-->%s(): receive info: pkt_type=%d(%s), len=%d!\n", __FUNCTION__,
+           //pkt_type, pkt_type <= 5 ? pkt_type_str[pkt_type] : "ErrPktType", len);
     switch (pkt_type) {
         case HCI_EVENT_PKT:
             if (len < HCI_EVENT_HDR_SIZE) {
@@ -222,20 +224,17 @@ int rtbt_hci_dev_receive(void *bt_dev, int pkt_type, char *buf, int len)
 
 int rtbt_hci_dev_open(struct hci_dev *hdev)
 {
-    int status = -EBUSY;
+    int status = -EPERM;
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     struct rtbt_os_ctrl *os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hdev);
 #else
     struct rtbt_os_ctrl *os_ctrl = (struct rtbt_os_ctrl *)hdev->driver_data;
 #endif
-
     printk("-->%s()\n", __FUNCTION__);
-
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,4,0)
     if (test_bit(HCI_RUNNING, &hdev->flags))
         return 0;
 #endif
-
     if (os_ctrl && os_ctrl->hps_ops && os_ctrl->hps_ops->open)
         status = os_ctrl->hps_ops->open(os_ctrl->dev_ctrl);
     else {
@@ -244,7 +243,6 @@ int rtbt_hci_dev_open(struct hci_dev *hdev)
 #endif
         printk("Error: os_ctrl->hps_ops->dev_open is null\n");
     }
-
     if (status == 0) {
         os_ctrl->sco_tx_seq = -1;
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,4,0)
@@ -252,37 +250,29 @@ int rtbt_hci_dev_open(struct hci_dev *hdev)
 #endif
     }
     printk("<--%s(), status=%d\n", __FUNCTION__, status);
-
     return status;
 }
 
 int rtbt_hci_dev_close(struct hci_dev *hdev)
 {
-    int status = -EBUSY;
+    int status = -EPERM;
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     struct rtbt_os_ctrl *os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hdev);
 #else
     struct rtbt_os_ctrl *os_ctrl = (struct rtbt_os_ctrl *)hdev->driver_data;
 #endif
-
     printk("--->%s()\n", __FUNCTION__);
-
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,4,0)
     if (!test_and_clear_bit(HCI_RUNNING, &(hdev->flags))){
         printk("%s():Directly return due to hdev->flags=0x%lx\n", __FUNCTION__, hdev->flags);
         return 0;
     }
 #endif
-
-    rtbt_hci_dev_flush(hdev);
-
     if (os_ctrl && os_ctrl->hps_ops && os_ctrl->hps_ops->close)
         status = os_ctrl->hps_ops->close(os_ctrl->dev_ctrl);
     else
         printk("%s():os_ctrl->hps_ops->close is null!\n", __FUNCTION__);
-
     printk("<---%s()\n", __FUNCTION__);
-
     return status;
 }
 
@@ -303,28 +293,23 @@ int rtbt_hps_iface_resume(IN struct rtbt_os_ctrl *os_ctrl)
 int rtbt_hps_iface_detach(IN struct rtbt_os_ctrl *os_ctrl)
 {
     struct hci_dev *hdev = os_ctrl->bt_dev;
-
     printk("--->%s()\n", __FUNCTION__);
-
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     hci_dev_hold(hdev);
 #else
     __hci_dev_hold(hdev);
 #endif
-
     /* un-register HCI device */
     if (!hdev) {
         printk("%s():os_ctrl(%p)->bt_dev is NULL\n", __FUNCTION__, os_ctrl);
         return -1;
     }
     hci_unregister_dev(hdev);
-
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     hci_dev_put(hdev);
 #else
     __hci_dev_put(hdev);
 #endif
-
     printk("<---%s():Success\n", __FUNCTION__);
     return 0;
 }
@@ -333,25 +318,21 @@ int rtbt_hps_iface_attach(IN struct rtbt_os_ctrl *os_ctrl)
 {
     struct hci_dev *hdev = os_ctrl->bt_dev;
     printk("--->%s()\n", __FUNCTION__);
-
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     hci_dev_hold(hdev);
 #else
     __hci_dev_hold(hdev);
 #endif
-
     /* Register HCI device */
     if (hci_register_dev(hdev) < 0) {
         printk("Can't register HCI device\n");
         return -ENODEV;
     }
-
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     hci_dev_put(hdev);
 #else
     __hci_dev_put(hdev);
 #endif
-
     printk("<---%s():Success\n", __FUNCTION__);
     return 0;
 }
@@ -362,18 +343,15 @@ int rtbt_hps_iface_deinit(
     IN struct rtbt_os_ctrl *os_ctrl)
 {
     struct hci_dev *hdev;
-
     if (if_type == RAL_INF_PCI) {
         hdev = (struct hci_dev *)pci_get_drvdata(if_dev);
         printk("%s():hciDev=0x%p\n", __FUNCTION__, hdev);
     }
     else
         return FALSE;
-
     if (hdev)
         hci_free_dev(hdev);
     os_ctrl->bt_dev = NULL;
-
     return TRUE;
 }
 
@@ -383,9 +361,7 @@ int rtbt_hps_iface_init(
     IN struct rtbt_os_ctrl *os_ctrl)
 {
     struct hci_dev *hdev;
-
     printk("--->%s(): if_type=%d\n", __FUNCTION__, if_type);
-
     /* Initialize HCI device */
     hdev = hci_alloc_dev();
     if (!hdev) {
