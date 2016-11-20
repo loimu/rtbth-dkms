@@ -51,7 +51,7 @@ static int rtbt_pci_suspend(struct pci_dev *pdev, pm_message_t state)
     struct hci_dev *hci_dev = (struct hci_dev *)pci_get_drvdata(pdev);
 	struct rtbt_os_ctrl *os_ctrl;
 
-//    printk("%s():Into suspend! pm_message_state=%d\n", __FUNCTION__, state);//sean wang linux, fix the build warning, type casting
+    printk("-->%s(): pm_message_state=%d\n", __FUNCTION__, state.event);
 
 	if (hci_dev == NULL){
 		printk("%s(): pci_get_drvdata failed!\n", __FUNCTION__);
@@ -71,10 +71,7 @@ static int rtbt_pci_suspend(struct pci_dev *pdev, pm_message_t state)
 //msleep(10000);
 //    rtbt_hps_iface_detach(os_ctrl);
 //    os_ctrl->hps_ops->suspend(os_ctrl->dev_ctrl);
-
-
-	printk("Exit from rtbt_pci_remove!\n");
-
+	printk("<--%s()\n", __FUNCTION__);
 	return 0;
 }
 
@@ -83,6 +80,8 @@ static int rtbt_pci_resume(struct pci_dev *pdev)
 {
     struct hci_dev *hci_dev = (struct hci_dev *)pci_get_drvdata(pdev);
     struct rtbt_os_ctrl *os_ctrl;
+
+    printk("-->%s()\n", __FUNCTION__);
 
     if (hci_dev == NULL){
         printk("%s(): pci_get_drvdata failed!\n", __FUNCTION__);
@@ -101,8 +100,7 @@ static int rtbt_pci_resume(struct pci_dev *pdev)
 
  //   os_ctrl->hps_ops->resume(os_ctrl->dev_ctrl);
  //   rtbt_hps_iface_attach(os_ctrl);
- //   printk("Exit from rtbt_pci_remove!\n");
-
+    printk("<--%s()\n", __FUNCTION__);
     return 0;
 }
 #endif /* CONFIG_PM */
