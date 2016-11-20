@@ -128,15 +128,13 @@ int rtbt_hci_dev_send(struct sk_buff *skb)
     switch (pkt_type) {
         case HCI_COMMAND_PKT:
             status = hps_ops->hci_cmd(os_ctrl->dev_ctrl, skb->data, skb->len);
-            if( (hdev!=0) && (status == 0)){
+            if(hdev && (status == 0))
                 hdev->stat.cmd_tx++;
-            }
             break;
         case HCI_ACLDATA_PKT:
             status = hps_ops->hci_acl_data(os_ctrl->dev_ctrl, skb->data, skb->len);
-            if( (hdev!=0) && (status == 0)){
+            if(hdev && (status == 0))
                 hdev->stat.acl_tx++;
-            }
             break;
         case HCI_SCODATA_PKT:
             printk("-->%s():sco len=%d,time=0x%lx\n", __FUNCTION__, skb->len, jiffies);
@@ -149,20 +147,18 @@ int rtbt_hci_dev_send(struct sk_buff *skb)
 #endif
             os_ctrl->sco_time_hci = jiffies;
             status = hps_ops->hci_sco_data(os_ctrl->dev_ctrl, skb->data, skb->len);
-            if( (hdev!=0) && (status == 0)){
+            if(hdev && (status == 0))
                 hdev->stat.sco_tx++;
-            }
             printk("<--%s():sco done, time=0x%lx\n", __FUNCTION__, jiffies);
             break;
         case HCI_VENDOR_PKT:
             break;
     }
 
-    if( (hdev!=0) && (status == 0)){
+    if(hdev && (status == 0))
         hdev->stat.byte_tx += skb->len;
-    } else {
+    else
         hdev->stat.err_tx++;
-    }
     kfree_skb(skb);
     return 0;
 }
@@ -205,7 +201,7 @@ int rtbt_hci_dev_receive(void *bt_dev, int pkt_type, char *buf, int len)
     rtbt_set_pkt_type(skb, pkt_type);
     memcpy(skb_put(skb, len), buf, len);
     if (pkt_type == HCI_SCODATA_PKT)
-    printk("-->%s(): send sco data to OS, time=0x%lx\n", __FUNCTION__, jiffies);
+        printk("-->%s(): send sco data to OS, time=0x%lx\n", __FUNCTION__, jiffies);
     hdev = (struct hci_dev *)skb->dev;
     if(hdev){
         hdev->stat.byte_rx += len;
