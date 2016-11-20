@@ -194,7 +194,7 @@ int rtbt_hci_dev_receive(void *bt_dev, int pkt_type, char *buf, int len)
     }
     skb = bt_skb_alloc(len, GFP_ATOMIC);
     if (!skb) {
-        printk("%s no memory for the packet", ((struct hci_dev *)bt_dev)->name);
+        BT_ERR("No memory for the packet");
         return -ENOMEM;
     }
     skb->dev = g_hdev;
@@ -318,7 +318,7 @@ int rtbt_hps_iface_attach(IN struct rtbt_os_ctrl *os_ctrl)
 #endif
     /* Register HCI device */
     if (hci_register_dev(hdev) < 0) {
-        printk("Can't register HCI device\n");
+        BT_ERR("Can't register HCI device");
         return -ENODEV;
     }
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
@@ -354,11 +354,11 @@ int rtbt_hps_iface_init(
     IN struct rtbt_os_ctrl *os_ctrl)
 {
     struct hci_dev *hdev;
-    printk("--->%s(): if_type=%d\n", __FUNCTION__, if_type);
+    printk("-->%s(): if_type=%d\n", __FUNCTION__, if_type);
     /* Initialize HCI device */
     hdev = hci_alloc_dev();
     if (!hdev) {
-        printk("Can't allocate HCI device\n");
+        BT_ERR("Can't allocate HCI device");
         return -1;
     }
 
@@ -382,7 +382,7 @@ int rtbt_hps_iface_init(
             }
             break;
         default:
-            printk("invalid if_type(%d)!\n", if_type);
+            BT_ERR("invalid if_type(%d)!", if_type);
             hci_free_dev(hdev);
             return -1;
     }
