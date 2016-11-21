@@ -153,7 +153,7 @@ struct rtbth_trctrl {
 	void *payload; /*per operation*/
 };
 
-struct rbbth_dmac {
+struct rtbth_dmac {
     int dmac_op;
 };
 

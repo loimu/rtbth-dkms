@@ -1828,7 +1828,7 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
 
         case RTBTH_IOCDMAC:
             do {
-                struct rbbth_dmac dmac;
+                struct rtbth_dmac dmac;
 
                 if (copy_from_user(&dmac, (void *)arg, sizeof(dmac))) {
                     retval = -EFAULT;
