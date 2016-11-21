@@ -46,7 +46,7 @@ typedef enum _RTBTH_EVENT_T {
     INT_LMPTMR_EVENT,
     INT_LMPERR_EVENT,
     RTBTH_TEST_EVENT,
-    RTBTH_EXIT,    
+    RTBTH_EXIT,
     RTBTH_EVENT_NUM
 } RTBTH_EVENT_T;
 
@@ -78,14 +78,14 @@ typedef enum _RTBTH_EVENT_T {
 //
 typedef enum _bz_type_t {
     bz_hci = 0,
-    bz_acl, 
+    bz_acl,
     bz_sco,
     bz_num,
 } bz_type_t;
 
 typedef enum _tr_op_t {
     tr_tx = 0,
-    tr_rx , 
+    tr_rx ,
     tr_tx_free,
     tr_tx_empty,
     tr_tx_num
@@ -94,7 +94,7 @@ typedef enum _tr_op_t {
 struct rtbth_pci32write {
 	unsigned long  addr; /*input*/
 	unsigned int value; /*input*/
-} ; 
+} ;
 
 struct rtbth_pci32read {
 	unsigned long  addr; /*input*/
@@ -135,26 +135,26 @@ struct rtbth_rfread {
 
 struct rtbth_bzwrite {
 	bz_type_t       type; /*input*/
-	unsigned short  len;  /*input*/      
+	unsigned short  len;  /*input*/
 	unsigned char  *buf;  /*input*/
 } ;
 
 struct rtbth_bzread {
 	//bz_type_t       type; /*output*/
     bz_type_t type;
-    unsigned short  len_buf;   /*intput*/ 
-	unsigned short  len_pkt;  /*output*/  
+    unsigned short  len_buf;   /*intput*/
+	unsigned short  len_pkt;  /*output*/
 	unsigned char   *buf;  /*output*/
 } ;
 
 struct rtbth_trctrl {
 	tr_op_t  op; /*input*/
-	unsigned short  len_struct; /*input*/    
+	unsigned short  len_struct; /*input*/
 	void *payload; /*per operation*/
 };
 
 struct rbbth_dmac {
-    int dmac_op;   
+    int dmac_op;
 };
 
 struct rtbth_tx_ctrl {
@@ -226,16 +226,16 @@ struct rtbth_tx_empty {
 };
 
 typedef enum _job_sync_t {
-    sync_core_init = 0, 
+    sync_core_init = 0,
     sync_core_deinit,
-    sync_core_start,  
-    sync_core_end, 
+    sync_core_start,
+    sync_core_end,
     sync_core_epinit
 } job_sync_t;
 
 struct rtbth_sync {
 	job_sync_t  job; /*input*/
-} ; 
+} ;
 
 //INT32 _rtbth_us_event_notification(RTBTH_ADAPTER *pAd, RTBTH_EVENT_T evt);
 

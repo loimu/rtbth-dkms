@@ -96,7 +96,7 @@ typedef enum e_logical_link_index {
 
 //#define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 
-UINT32 osal_op_get_id(P_OSAL_OP pOp) 
+UINT32 osal_op_get_id(P_OSAL_OP pOp)
 {
     return (pOp) ? pOp->op.opId : 0xFFFFFFFF;
 }
@@ -293,18 +293,18 @@ int osal_event_init (
     P_OSAL_EVENT pEvent
     )
 {
-    init_waitqueue_head(&pEvent->waitQueue);    
-    
+    init_waitqueue_head(&pEvent->waitQueue);
+
     return 0;
 }
 
 int osal_wait_for_event(
-    P_OSAL_EVENT pEvent, 
+    P_OSAL_EVENT pEvent,
     int (*condition)(PVOID),
     void *cond_pa
     )
 {
-    return  wait_event_interruptible(pEvent->waitQueue, condition(cond_pa)); 
+    return  wait_event_interruptible(pEvent->waitQueue, condition(cond_pa));
 }
 
 int osal_wait_for_event_timeout(
@@ -324,7 +324,7 @@ int osal_trigger_event(
     wake_up_interruptible(&pEvent->waitQueue);
     return ret;
 }
-                                                        
+
 int
 osal_event_deinit (
     P_OSAL_EVENT pEvent
@@ -333,14 +333,14 @@ osal_event_deinit (
     return 0;
 }
 
-int osal_op_is_wait_for_signal(P_OSAL_OP pOp) 
+int osal_op_is_wait_for_signal(P_OSAL_OP pOp)
 {
     return (pOp && pOp->signal.timeoutValue) ?  1 : 0;
 }
 
-void osal_op_raise_signal(P_OSAL_OP pOp, int result) 
+void osal_op_raise_signal(P_OSAL_OP pOp, int result)
 {
-    if (pOp) 
+    if (pOp)
     {
         pOp->result = result;
         osal_raise_signal(&pOp->signal);
@@ -355,28 +355,28 @@ static int in=0;
     if (NULL == pStpOp){
         return -1;
     }
-    
-    switch(pStpOp->opId) {        
+
+    switch(pStpOp->opId) {
         case BZ_HCI_EVENT:
         case BZ_ACL_EVENT:
-        case BZ_SCO_EVENT:           
+        case BZ_SCO_EVENT:
         case INT_RX_EVENT:
-        case INT_TX_EVENT: 
+        case INT_TX_EVENT:
         case INT_MCUCMD_EVENT:
         case INT_MCUEVT_EVENT:
         case INT_LMPTMR_EVENT:
-        case INT_LMPERR_EVENT:            
+        case INT_LMPERR_EVENT:
         case RTBTH_TEST_EVENT:
-            DebugPrint(TRACE, DBG_INIT,"Event =%d, jiffies = %d, evt_fifo_len = %d, in=%d\n", 
+            DebugPrint(TRACE, DBG_INIT,"Event =%d, jiffies = %d, evt_fifo_len = %d, in=%d\n",
                 pStpOp->opId, jiffies, kfifo_len(pAd->evt_fifo), ++in);
-            if(kfifo_avail(pAd->evt_fifo) >= sizeof(RTBTH_EVENT_T)){ 
+            if(kfifo_avail(pAd->evt_fifo) >= sizeof(RTBTH_EVENT_T)){
                 evt = pStpOp->opId;
                 kfifo_in(pAd->evt_fifo, &evt , sizeof(RTBTH_EVENT_T));
                // if(kfifo_len(pAd->evt_fifo) == sizeof(RTBTH_EVENT_T)){
                // if(kfifo_len(pAd->evt_fifo) > 0){
                     evt_wq_flag = 1;
-                    wake_up_interruptible(&evt_wq); 
-              //  }                
+                    wake_up_interruptible(&evt_wq);
+              //  }
                 ret = 0;
             } else {
                 DebugPrint(TRACE, DBG_INIT,"evt_fifo size is not available!\n");
@@ -386,18 +386,18 @@ static int in=0;
         case INIT_COREINIT_EVENT:
         case INIT_COREDEINIT_EVENT:
         case INIT_CORESTART_EVENT:
-        case INIT_CORESTOP_EVENT:    
-        case INIT_EPINIT_EVENT:   
+        case INIT_CORESTOP_EVENT:
+        case INIT_EPINIT_EVENT:
             DebugPrint(LOUD, DBG_INIT,"Event =%d, jiffies = %d, evt_fifo_len = %d, in=%d\n",
                 pStpOp->opId,  jiffies, kfifo_len(pAd->evt_fifo), ++in);
-            if(kfifo_avail(pAd->evt_fifo) >= sizeof(RTBTH_EVENT_T)){ 
+            if(kfifo_avail(pAd->evt_fifo) >= sizeof(RTBTH_EVENT_T)){
                 evt = pStpOp->opId;
                 kfifo_in(pAd->evt_fifo, &evt , sizeof(RTBTH_EVENT_T));
         //        if(kfifo_len(pAd->evt_fifo) == sizeof(RTBTH_EVENT_T)){
        // if(kfifo_len(pAd->evt_fifo) > 0){
                     evt_wq_flag = 1;
-                    wake_up_interruptible(&evt_wq); 
-         //       }                
+                    wake_up_interruptible(&evt_wq);
+         //       }
                 ret = 0;
             } else {
                 DebugPrint(TRACE, DBG_INIT,"evt_fifo size is not available!\n");
@@ -406,22 +406,22 @@ static int in=0;
             DebugPrint(TRACE, DBG_INIT,"wait for the event complete\n");
           //  msleep(1000);
             sync_wq_flag = 0;
-            ret = wait_event_interruptible_timeout(sync_wq, sync_wq_flag != 0, HZ);            
+            ret = wait_event_interruptible_timeout(sync_wq, sync_wq_flag != 0, HZ);
             if(!ret)
                 DebugPrint(TRACE, DBG_INIT,"wait for sync timeout\n");
 
             break;
-            
+
         case RTBTH_EXIT:
             ret = 0;
             break;
-            
+
         default:
            DebugPrint(TRACE, DBG_INIT,"invalid operation id (%d)\n", pStpOp->opId);
            ret = -1;
            break;
     }
-    
+
     return ret;
 }
 
@@ -432,19 +432,19 @@ static P_OSAL_OP _rtbth_us_get_op (
 {
     P_OSAL_OP pOp;
 
-    if (!pOpQ) 
+    if (!pOpQ)
     {
        DebugPrint(TRACE, DBG_INIT,"pOpQ == NULL\n");
         return NULL;
     }
 
-    osal_lock_unsleepable_lock(&(pAd->wq_spinlock));    
+    osal_lock_unsleepable_lock(&(pAd->wq_spinlock));
     /* acquire lock success */
     RB_GET(pOpQ, pOp);
 
     osal_unlock_unsleepable_lock(&(pAd->wq_spinlock));
-    
-    if (!pOp) 
+
+    if (!pOp)
     {
         DebugPrint(TRACE, DBG_INIT,"RB_GET fail\n");
     }
@@ -459,10 +459,10 @@ static int _rtbth_us_put_op (RTBTH_ADAPTER *pAd, P_OSAL_OP_Q pOpQ, P_OSAL_OP pOp
         DebugPrint(TRACE, DBG_INIT,"pOpQ = 0x%p, pLxOp = 0x%p \n", pOpQ, pOp);
         return 0;
     }
-    
+
     ret = 0;
-    
-    osal_lock_unsleepable_lock(&(pAd->wq_spinlock));       
+
+    osal_lock_unsleepable_lock(&(pAd->wq_spinlock));
     if (!RB_FULL(pOpQ)){
         RB_PUT(pOpQ, pOp);
     } else {
@@ -472,7 +472,7 @@ static int _rtbth_us_put_op (RTBTH_ADAPTER *pAd, P_OSAL_OP_Q pOpQ, P_OSAL_OP pOp
 
     if (ret){
         DebugPrint(TRACE, DBG_INIT,"RB_FULL, RB_COUNT=%d , RB_SIZE=%d\n",RB_COUNT(pOpQ), RB_SIZE(pOpQ));
-        return 0; 
+        return 0;
     } else {
         return 1;
     }
@@ -505,9 +505,9 @@ int _rtbth_us_put_act_op (RTBTH_ADAPTER *pAd, P_OSAL_OP pOp)
             DebugPrint(ERROR, DBG_INIT,"pAd = %p, pOp = %p\n", pAd, pOp);
             break;
         }
-        
+
         pSignal = &pOp->signal;
-        
+
         if (pSignal->timeoutValue){
             pOp->result = -9;
             osal_signal_init(&pOp->signal);
@@ -530,7 +530,7 @@ int _rtbth_us_put_act_op (RTBTH_ADAPTER *pAd, P_OSAL_OP pOp)
             /* clean it in wmtd */
             break;
         }
-        
+
         /* wait result, clean it here */
         bCleanup = 1;//MTK_WCN_BOOL_TRUE;
 
@@ -542,7 +542,7 @@ int _rtbth_us_put_act_op (RTBTH_ADAPTER *pAd, P_OSAL_OP pOp)
             DebugPrint(TRACE, DBG_INIT,"wait completion timeout \n");
             // TODO: how to handle it? retry?
         } else  {
-            if (pOp->result) 
+            if (pOp->result)
             {
                 DebugPrint(TRACE, DBG_INIT,"op(%d) result:%d\n", pOp->op.opId, pOp->result);
             }
@@ -567,7 +567,7 @@ static int _rtbth_us_wait_for_evt(void *pvData)
     RTBTH_ADAPTER *pAd = (RTBTH_ADAPTER *)pvData;
 
     DebugPrint(LOUD, DBG_INIT,"%s: pAd->rActiveOpQ = %d\n", __func__, RB_COUNT(&pAd->rActiveOpQ));
-    
+
     return ((!RB_EMPTY(&pAd->rActiveOpQ)) || osal_thread_should_stop(&pAd->PSMd));
 }
 
@@ -582,7 +582,7 @@ INT32 _rtbth_us_event_notification(RTBTH_ADAPTER *pAd, RTBTH_EVENT_T evt)
     }
 
     pOp = _rtbth_us_get_free_op(pAd);
-    if (!pOp) 
+    if (!pOp)
     {
         DebugPrint(ERROR, DBG_INIT,"get_free_lxop fail \n");
         return -1;
@@ -622,21 +622,21 @@ static int _rtbth_us_proc (void *pvData)
     for (;;) {
 
         pOp = NULL;
-        
-        osal_wait_for_event(&pAd->STPd_event, 
+
+        osal_wait_for_event(&pAd->STPd_event,
             _rtbth_us_wait_for_evt,
             (void *)pAd);
 
-        if (osal_thread_should_stop(&pAd->PSMd)) 
+        if (osal_thread_should_stop(&pAd->PSMd))
         {
             DebugPrint(TRACE, DBG_INIT,"should stop now... \n");
             // TODO: clean up active opQ
             break;
         }
 
-        /* get Op from activeQ */        
+        /* get Op from activeQ */
         pOp = _rtbth_us_get_op(pAd, &pAd->rActiveOpQ);
-        if (!pOp) 
+        if (!pOp)
         {
             DebugPrint(TRACE, DBG_INIT,"+++++++++++ Get op from activeQ fail, maybe disable/enable psm\n");
             continue;
@@ -644,7 +644,7 @@ static int _rtbth_us_proc (void *pvData)
 
         id = osal_op_get_id(pOp);
 
-        if (id >= RTBTH_EVENT_NUM) 
+        if (id >= RTBTH_EVENT_NUM)
         {
            DebugPrint(TRACE, DBG_INIT,"abnormal opid id: 0x%x \n", id);
             ret = -1;
@@ -655,16 +655,16 @@ static int _rtbth_us_proc (void *pvData)
 
 handler_done:
 
-        if (ret) 
+        if (ret)
         {
          //   DebugPrint(TRACE, DBG_INIT,"opid id(0x%x)(%s) error(%d)\n", id, (id >= 4)?("???"):(g_psm_op_name[id]), ret);
         }
 
-        if (osal_op_is_wait_for_signal(pOp)) 
+        if (osal_op_is_wait_for_signal(pOp))
         {
             osal_op_raise_signal(pOp, ret);
         }
-        else 
+        else
         {
            /* put Op back to freeQ */
            if(_rtbth_us_put_op(pAd, &pAd->rFreeOpQ, pOp) == 0)
@@ -673,7 +673,7 @@ handler_done:
            }
         }
 
-        if (RTBTH_EXIT == id) 
+        if (RTBTH_EXIT == id)
         {
             break;
         }
@@ -688,7 +688,7 @@ static int rtbth_us_open(struct inode *inode, struct file *file){
 
     if(!capable(CAP_SYS_ADMIN))
         return -EPERM;
-    
+
     if(!atomic_dec_and_test(&rtbth_us_avail)){
         atomic_inc(&rtbth_us_avail);
         DebugPrint(WARNING, DBG_INIT,"rtbth occupied: rtbth_us_avail=%d\n",
@@ -702,9 +702,9 @@ static int rtbth_us_open(struct inode *inode, struct file *file){
         iminor(inode),
         current->pid
         );
-    bind_wq_flag = 1;    
+    bind_wq_flag = 1;
 #if 0
-    /* Init the host protocol stack hooking interface */        
+    /* Init the host protocol stack hooking interface */
     if (rtbt_hps_iface_init(RAL_INF_PCI,  gpAd->os_ctrl->if_dev , gpAd->os_ctrl)){
          DebugPrint(ERROR, DBG_INIT,"rtbt_hps_iface_init fail\n");
     } else {
@@ -717,7 +717,7 @@ static int rtbth_us_open(struct inode *inode, struct file *file){
     } else {
          DebugPrint(ERROR, DBG_INIT,"rtbt_hps_iface_attach ok\n");
     }
-    
+
     return 0;
 }
 
@@ -733,7 +733,7 @@ static int rtbth_us_close(struct inode *inode, struct file *file){
         iminor(inode),
         current->pid
         );
-    bind_wq_flag = 0;    
+    bind_wq_flag = 0;
 
     if(rtbt_hps_iface_detach(gpAd->os_ctrl)){
          DebugPrint(ERROR, DBG_INIT,"rtbt_hps_iface_detach fail\n");
@@ -746,7 +746,7 @@ static int rtbth_us_close(struct inode *inode, struct file *file){
     } else {
          DebugPrint(ERROR, DBG_INIT,"rtbt_hps_iface_deinit ok\n");
     }
-#endif     
+#endif
     return 0;
 }
 
@@ -757,7 +757,7 @@ ssize_t rtbth_us_read(struct file *filp, char __user *buf, size_t count, loff_t 
     ssize_t retval = 0;
     RTBTH_EVENT_T evt = 0;
     int wait_ret = 0;
-    
+
 //    down(&rd_mtx);
 
     if(!capable(CAP_SYS_ADMIN))
@@ -792,7 +792,7 @@ ssize_t rtbth_us_read(struct file *filp, char __user *buf, size_t count, loff_t 
                     DebugPrint(TRACE, DBG_INIT,"%s: receive the event, return to user space\n", __func__);
             }
         }
-    }    
+    }
     if(retval == -EAGAIN)
         goto out;
 
@@ -801,7 +801,7 @@ ssize_t rtbth_us_read(struct file *filp, char __user *buf, size_t count, loff_t 
         retval = -EFAULT;
         goto out;
     }
-    
+
     retval = sizeof(RTBTH_EVENT_T);
 
 out:
@@ -818,21 +818,21 @@ ssize_t rtbth_us_read(struct file *filp, char __user *buf, size_t count, loff_t 
     int wait_ret = 0;
 static int entries = 0;
 static int out=0;
-    
+
     entries = 0;
 
     if(!capable(CAP_SYS_ADMIN))
         return -EPERM;
-    
+
     while(1){
         if(kfifo_len(gpAd->evt_fifo) > 0){
             kfifo_out(gpAd->evt_fifo, &evt, sizeof(RTBTH_EVENT_T));
             DebugPrint(TRACE, DBG_INIT,"%s: remaining event fifo len = %d, out=%d\n", __func__, kfifo_len(gpAd->evt_fifo), ++out);
             break;
         } else {
-            DebugPrint(TRACE, DBG_INIT,"%s: wait for the event, pending on kernel space, %d, kfifo_len(evt)=%d\n", 
+            DebugPrint(TRACE, DBG_INIT,"%s: wait for the event, pending on kernel space, %d, kfifo_len(evt)=%d\n",
                 __func__, entries++, kfifo_len(gpAd->evt_fifo));
-            
+
            // wait_ret = wait_event_interruptible(evt_wq, evt_wq_flag != 0);
            wait_ret = wait_event_interruptible_timeout(evt_wq, evt_wq_flag != 0, HZ);
            DebugPrint(INFO, DBG_INIT,"%s: wait event returned value %d\n ", __func__, wait_ret);
@@ -859,7 +859,7 @@ static int out=0;
         goto out;
     }
     DebugPrint(TRACE, DBG_INIT,"return type=%d, return to user space\n", evt);
-    
+
     retval = sizeof(RTBTH_EVENT_T);
 
 out:
@@ -1130,7 +1130,7 @@ PDMA_Is_TxRing_Empty(
                    TxRingIdx);
         return TRUE;
     }
-    
+
     pTxRing = &pAd->TxRing[TxRingIdx];
 
     TxCpuIdx = pTxRing->TxCpuIdx;
@@ -1215,8 +1215,8 @@ void rtbth_us_rf_read(unsigned char id, unsigned char *pval){
 }
 
 void rtbth_us_txring_tick(struct rtbth_tx_ctrl *tx_ctrl, unsigned char *buf){
-    
-    PDMA_Transmit_TxRing(gpAd, tx_ctrl->ll_idx, tx_ctrl->ring_idx, tx_ctrl->pkt_type, tx_ctrl->ll_id, tx_ctrl->pflow, 
+
+    PDMA_Transmit_TxRing(gpAd, tx_ctrl->ll_idx, tx_ctrl->ring_idx, tx_ctrl->pkt_type, tx_ctrl->ll_id, tx_ctrl->pflow,
         tx_ctrl->tag, buf /*tx_ctrl->ppkt*/, tx_ctrl->len, tx_ctrl->auto_flushable, tx_ctrl->pkt_seq, tx_ctrl->ch_sel, tx_ctrl->code_type);
 }
 
@@ -1238,7 +1238,7 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
     int retval = 0;
     static unsigned char  buf[2048];
     int type =0;
-  unsigned short len = 0; 
+  unsigned short len = 0;
     struct kfifo  *fifo;
     spinlock_t  *fifo_sp;
     unsigned char chk[2];
@@ -1248,25 +1248,25 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
     if(!capable(CAP_SYS_ADMIN))
         return -EPERM;
 
-    if (_IOC_TYPE(cmd) != RTBTH_US_IOC_MAGIC) 
-        return -ENOTTY; 
+    if (_IOC_TYPE(cmd) != RTBTH_US_IOC_MAGIC)
+        return -ENOTTY;
 
-    if (_IOC_NR(cmd) > RTBTH_IOC_MAXNR) 
+    if (_IOC_NR(cmd) > RTBTH_IOC_MAXNR)
         return -ENOTTY;
  //DebugPrint(TRACE, DBG_INIT,"ioctl request = %d\n", cmd);
-    
+
     switch(cmd) {
-        
+
         case RTBTH_IOCPCI32WRITE:
 
-        do {            
+        do {
             struct rtbth_pci32write pci32wr;
 
 	        if (!capable(CAP_SYS_RAWIO)) {
                 retval = -EPERM;
                 break;
             }
-            
+
             if (copy_from_user(&pci32wr, (void *)arg, sizeof(pci32wr))) {
                 retval = -EFAULT;
                 DebugPrint(ERROR, DBG_INIT,"copy_from_user failed at %d\n", __LINE__);
@@ -1276,26 +1276,26 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
             rtbth_us_pci32_write(pci32wr.addr , pci32wr.value);
 
         }while(0);
-            
+
         break;
 
         case RTBTH_IOCPCI32READ:
 
         do {
-            struct rtbth_pci32read pci32rd; 
+            struct rtbth_pci32read pci32rd;
             unsigned int val;
 
             if (!capable(CAP_SYS_RAWIO)) {
                 retval = -EPERM;
                 break;
             }
-            
+
             if (copy_from_user(&pci32rd, (void *)arg, sizeof(pci32rd))) {
                 retval = -EFAULT;
                 DebugPrint(ERROR, DBG_INIT,"copy_from_user failed at %d\n", __LINE__);
                 break;
             }
-            
+
             rtbth_us_pci32_read(pci32rd.addr, &val);
 
             if (copy_to_user((void *)(arg + offsetof(struct rtbth_pci32read, value)), &val, sizeof(val)))
@@ -1303,22 +1303,22 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                 retval = -EFAULT;
                 DebugPrint(ERROR, DBG_INIT,"copy_to_user failed at %d\n", __LINE__);
                 break;
-            }  
+            }
         }while(0);
-            
+
         break;
 
         case RTBTH_IOCMCUWRITE:
-            
+
         do {
 
-            struct rtbth_mcuwrite mcuwr; 
+            struct rtbth_mcuwrite mcuwr;
 
             if (!capable(CAP_SYS_RAWIO)) {
                 retval = -EPERM;
                 break;
             }
-            
+
             if (copy_from_user(&mcuwr, (void *)arg, sizeof(mcuwr))) {
                 retval = -EFAULT;
                 DebugPrint(ERROR, DBG_INIT,"copy_from_user failed at %d\n", __LINE__);
@@ -1341,17 +1341,17 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
 
             DebugPrint(TRACE, DBG_INIT,"RTBTH_IOCMCUWRITE: [0]=0x%02x [1]=0x%02x [2]=0x%02x [3]=0x%02x [4]=0x%02x [5]=0x%02x \n",
                 buf[0], buf[1], buf[2], buf[3], buf[4], buf[5]);
-              
+
             rtbth_us_mcu_write(mcuwr.addr , &buf[0], mcuwr.len);
 
         }while(0);
-            
+
         break;
 
         case RTBTH_IOCMCUREAD:
 
         do {
-            struct rtbth_mcuread mcurd; 
+            struct rtbth_mcuread mcurd;
 
             if (!capable(CAP_SYS_RAWIO)) {
                 retval = -EPERM;
@@ -1371,7 +1371,7 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                 retval = -EFAULT;
                 break;
             }
-            
+
             rtbth_us_mcu_read(mcurd.addr, &buf[0], mcurd.len);
 
             if (copy_to_user((void *)(mcurd.buf), &buf[0], mcurd.len))
@@ -1379,9 +1379,9 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                 retval = -EFAULT;
                 DebugPrint(ERROR, DBG_INIT,"copy_to_user failed at %d\n", __LINE__);
                 break;
-            }  
+            }
         }while(0);
-            
+
         break;
 
         case RTBTH_IOCBBWRITE:
@@ -1393,35 +1393,35 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                 retval = -EPERM;
                 break;
             }
-            
+
             if (copy_from_user(&bbwr, (void *)arg, sizeof(bbwr))) {
                 retval = -EFAULT;
                 DebugPrint(ERROR, DBG_INIT,"copy_from_user failed at %d\n", __LINE__);
                 break;
             }
-            
+
             rtbth_us_bb_write(bbwr.id, bbwr.val);
         }while(0);
-                        
+
         break;
 
         case RTBTH_IOCBBREAD:
 
         do {
-            struct rtbth_bbread bbrd; 
+            struct rtbth_bbread bbrd;
             unsigned char val;
 
             if (!capable(CAP_SYS_RAWIO)) {
                 retval = -EPERM;
                 break;
             }
-            
+
             if (copy_from_user(&bbrd, (void *)arg, sizeof(bbrd))) {
                 retval = -EFAULT;
                 DebugPrint(ERROR, DBG_INIT,"copy_from_user failed at %d\n", __LINE__);
                 break;
             }
-            
+
             rtbth_us_bb_read(bbrd.id, &val);
 
             if (copy_to_user((void *)(arg + offsetof(struct rtbth_bbread, val)), &val, sizeof(val)))
@@ -1429,9 +1429,9 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                 retval = -EFAULT;
                 DebugPrint(ERROR, DBG_INIT,"copy_to_user failed at %d\n", __LINE__);
                 break;
-            }  
+            }
         }while(0);
-            
+
         break;
 
         case RTBTH_IOCRFWRITE:
@@ -1449,23 +1449,23 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                 DebugPrint(ERROR, DBG_INIT,"copy_from_user failed at %d\n", __LINE__);
                 break;
             }
-            
+
             rtbth_us_rf_write(rfwr.id, rfwr.val);
         }while(0);
-                        
+
         break;
 
         case RTBTH_IOCRFREAD:
 
         do {
-            struct rtbth_rfread rfrd; 
+            struct rtbth_rfread rfrd;
             unsigned char val;
 
             if (!capable(CAP_SYS_RAWIO)) {
                 retval = -EPERM;
                 break;
             }
-            
+
             if (copy_from_user(&rfrd, (void *)arg, sizeof(rfrd))) {
                 retval = -EFAULT;
                 DebugPrint(ERROR, DBG_INIT,"copy_from_user failed at %d\n", __LINE__);
@@ -1480,13 +1480,13 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                 retval = -EFAULT;
                 DebugPrint(ERROR, DBG_INIT,"copy_to_user failed at %d\n", __LINE__);
                 break;
-            }  
+            }
         }while(0);
-                
+
         break;
 
         case RTBTH_IOCBZWRITE:
-   
+
         do {
             struct rtbth_bzwrite bzwr;
 
@@ -1507,7 +1507,7 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                 retval = -EFAULT;
                 break;
             }
-            
+
             DebugPrint(TRACE, DBG_INIT,"RTBTH_IOCBZWRITE: type = %d, len = %d\n", bzwr.type, bzwr.len);
 
             if (copy_from_user(&buf, (void *)(bzwr.buf), bzwr.len)) {
@@ -1515,37 +1515,37 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                 DebugPrint(ERROR, DBG_INIT,"copy_from_user failed at %d\n", __LINE__);
                 break;
             }
-        
+
             //uslm todo: sean wang
-            _rtbt_hci_dev_receive(gpAd, bzwr.type, &buf[0], bzwr.len);                            
+            _rtbt_hci_dev_receive(gpAd, bzwr.type, &buf[0], bzwr.len);
 
         }while(0);
 
         break;
-            
+
         case RTBTH_IOCBZREAD:
 
             do {
-                
+
                 int sz_need = 2 + 2 + 1;
 
                 struct rtbth_bzread bzread;
                 unsigned long buf_addr;
-                
+
                 memset(&bzread, 0, sizeof(bzread));
-                
+
                 if (copy_from_user(&bzread, (void *)arg, sizeof(bzread))) {
                     retval = -EFAULT;
                     DebugPrint(ERROR, DBG_INIT,"copy_from_user failed at %d\n", __LINE__);
                     break;
                 }
-            
+
                 if(bzread.type >= bz_num){
                      DebugPrint(ERROR, DBG_INIT,"bz read type invalid %d\n", type);
                     retval = -EFAULT;
                     break;
                 }
-                
+
                 if(bzread.type == bz_hci){
                     fifo = gpAd->hci_fifo;
                     fifo_sp = &gpAd->hci_fifo_lock;
@@ -1559,31 +1559,31 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                     DebugPrint(ERROR, DBG_INIT,"type invalid (%d)\n", type);
                     retval = -EFAULT;
                     break;
-                }                            
-                
-                spin_lock_irqsave(fifo_sp,cpuflags);   
-    
+                }
+
+                spin_lock_irqsave(fifo_sp,cpuflags);
+
                 DebugPrint(TRACE, DBG_INIT,"bz type = %d, len of fifo = %d, len of buf = %d\n",bzread.type, kfifo_len(fifo), bzread.len_buf);
-                if(kfifo_len(fifo) >= sz_need) {              
+                if(kfifo_len(fifo) >= sz_need) {
                     kfifo_out(fifo, &chk[0] , sizeof(chk));
                     if(chk[0]!=0xcc && chk[1]!=0xcc){
                         DebugPrint(ERROR, DBG_INIT,"@@@@read bz data err: delimeter parsing fail, chk[0]=0x%02x, chk[1]=0x%02x\n", chk[0], chk[1]);
                         retval = -EFAULT;
-                        spin_unlock_irqrestore(fifo_sp,cpuflags);   
+                        spin_unlock_irqrestore(fifo_sp,cpuflags);
                         break;
-                    }                    
+                    }
                     kfifo_out(fifo, &len, sizeof(unsigned long));
                     if(len > 2048 || len < 1){
                         DebugPrint(ERROR, DBG_INIT,"@@@@read bz data err: len invalid (%d)\n", len);
                         retval = -EFAULT;
-                        spin_unlock_irqrestore(fifo_sp,cpuflags);   
+                        spin_unlock_irqrestore(fifo_sp,cpuflags);
                         break;
-                    }                    
+                    }
                     kfifo_out(fifo, buf, len);
                 } else {
                     DebugPrint(ERROR, DBG_INIT,"@@@@read bz data err: data not available, kfifo_len (%d), sz_need = %d\n", kfifo_len(fifo), sz_need);
                     retval = -EFAULT;
-                    spin_unlock_irqrestore(fifo_sp,cpuflags);   
+                    spin_unlock_irqrestore(fifo_sp,cpuflags);
                     break;
                 }
                 spin_unlock_irqrestore(fifo_sp,cpuflags);
@@ -1598,22 +1598,22 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                     retval = -EFAULT;
                     DebugPrint(ERROR, DBG_INIT,"copy_from_user failed at %d\n", __LINE__);
                     break;
-                } 
+                }
 
                 if (copy_to_user((void *)(buf_addr), &buf, len))
                 {
                     retval = -EFAULT;
                     break;
-                } 
+                }
             }while(0);
-            
+
         break;
 
         case RTBTH_IOCTRCTRL:
 
         do {
             struct rtbth_trctrl trctl;
-            
+
             if (copy_from_user(&trctl, (void *)arg, sizeof(trctl))) {
                 retval = -EFAULT;
                 DebugPrint(ERROR, DBG_INIT,"copy_from_user failed at %d\n", __LINE__);
@@ -1623,7 +1623,7 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
             if(trctl.op > tr_tx_num){
                 retval = -EFAULT;
                 DebugPrint(ERROR, DBG_INIT,"trctl.op > tr_tx_num, trctl.op = %d\n", __LINE__, trctl.op);
-                break;    
+                break;
             }
 
             if(trctl.len_struct > 2048){
@@ -1633,57 +1633,57 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
             }
 
             DebugPrint(TRACE, DBG_INIT,"RTBTH_IOCTRCTRL: op = %d, len_struct = %d\n", trctl.op, trctl.len_struct);
-            
+
             if(trctl.op == tr_tx){
-            #if 1    
+            #if 1
                 struct rtbth_tx_ctrl tx_ctrl;
-                
+
                 if (copy_from_user(&tx_ctrl, (void *)(trctl.payload), sizeof(tx_ctrl))) {
                     retval = -EFAULT;
-                    DebugPrint(ERROR, DBG_INIT,"copy_from_user failed at %d, sizeof(tx_ctrl)=%d, len_struct=%d\n", 
+                    DebugPrint(ERROR, DBG_INIT,"copy_from_user failed at %d, sizeof(tx_ctrl)=%d, len_struct=%d\n",
                         __LINE__, sizeof(tx_ctrl), sizeof(len_struct));
                     break;
-                } 
-                                
+                }
+
                 if (copy_from_user(&buf[0], (void *)(tx_ctrl.ppkt), tx_ctrl.len)) {
                     retval = -EFAULT;
                     DebugPrint(ERROR, DBG_INIT,"copy_from_user failed at %d\n", __LINE__);
                     break;
-                }   
-               
+                }
+
                 rtbth_us_txring_tick( &tx_ctrl, &buf[0]);
             #else
              DebugPrint(TRACE, DBG_INIT,"op == tr_tx\n");
-           #endif     
+           #endif
             } else if (trctl.op== tr_tx_empty) {
-            
+
                 struct rtbth_tx_empty pempty;
-                unsigned char isempty = 0;               
+                unsigned char isempty = 0;
 
                 DebugPrint(TRACE, DBG_INIT,"op == tr_tx_empty\n");
-                
+
                 if (copy_from_user(&pempty, (void *)(trctl.payload), sizeof(pempty))) {
                     retval = -EFAULT;
                     DebugPrint(ERROR, DBG_INIT,"111copy_from_user failed at %d\n", __LINE__);
                     break;
-                } 
+                }
 
-                DebugPrint(TRACE, DBG_INIT,"pempty.ring_idx = %d, offsetof(struct rtbth_tx_empty,isempty)=%d\n", 
+                DebugPrint(TRACE, DBG_INIT,"pempty.ring_idx = %d, offsetof(struct rtbth_tx_empty,isempty)=%d\n",
                     pempty.ring_idx, offsetof(struct rtbth_tx_empty,isempty));
-                
+
                 #if 1
                     isempty = rtbth_us_txring_isempty(pempty.ring_idx);
                 #else
                     isempty = 1;
                 #endif
-                                
+
                 if (copy_to_user((void *)(trctl.payload + offsetof(struct rtbth_tx_empty,isempty)), &isempty, sizeof(isempty))){
                     retval = -EFAULT;
                     DebugPrint(ERROR, DBG_INIT,"222copy_to_user failed at %d\n", __LINE__);
                     break;
                 }
             } else if (trctl.op== tr_tx_free){
-            
+
                 struct rtbth_tx_frcnt pfrcnt ;
                 unsigned short frcnt = 0;
 
@@ -1693,65 +1693,65 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                     retval = -EFAULT;
                     DebugPrint(ERROR, DBG_INIT,"copy_from_user failed at %d\n", __LINE__);
                     break;
-                } 
+                }
 
-                DebugPrint(TRACE, DBG_INIT,"pempty.ring_idx = %d, offsetof(struct rtbth_tx_empty,isempty)=%d\n", 
+                DebugPrint(TRACE, DBG_INIT,"pempty.ring_idx = %d, offsetof(struct rtbth_tx_empty,isempty)=%d\n",
                     pfrcnt.ring_idx, offsetof(struct rtbth_tx_frcnt, free_cnt ));
-                
+
                 #if 1
                     frcnt = rtbth_us_txring_free_cnt(pfrcnt.ring_idx);
                 #else
                     frcnt = 0xdd;
                 #endif
-                                
+
                 if (copy_to_user((void *)(trctl.payload + offsetof(struct rtbth_tx_frcnt, free_cnt )), &frcnt, sizeof(frcnt))){
                     retval = -EFAULT;
                     DebugPrint(ERROR, DBG_INIT,"copy_to_user failed at %d\n", __LINE__);
                     break;
                 }
             } else if (trctl.op== tr_rx) {
- 
+
 
                 RXBI_STRUC rxbi;
                 unsigned int  pkt_len;
                 unsigned long buf_addr;
                 unsigned short idx;
-             
+
                 fifo = gpAd->rx_fifo;
                 fifo_sp = &gpAd->rx_fifo_lock;
-                
-                spin_lock_irqsave(fifo_sp,cpuflags);   
-                //if(kfifo_len(fifo) >= sz_need) {              
+
+                spin_lock_irqsave(fifo_sp,cpuflags);
+                //if(kfifo_len(fifo) >= sz_need) {
                     kfifo_out(fifo, &chk[0] , sizeof(chk));
                     if(chk[0]!=0xcc && chk[1]!=0xcc){
                         DebugPrint(ERROR, DBG_INIT,"@@@@rx packet: delimeter parsing fail, chk[0]=0x%02x, chk[1]=0x%02x\n", chk[0], chk[1]);
                         retval = -EFAULT;
-                        spin_unlock_irqrestore(fifo_sp,cpuflags);   
+                        spin_unlock_irqrestore(fifo_sp,cpuflags);
                         break;
-                    }                    
+                    }
                     kfifo_out(fifo, &rxbi, sizeof(rxbi));
                     kfifo_out(fifo, &pkt_len, sizeof(pkt_len));
                    // if(pkt_len > 2048 || pkt_len < sz_need){
                     if(pkt_len > 2048){
                         DebugPrint(ERROR, DBG_INIT,"@@@@rx packet err: len invalid (%d)\n", pkt_len);
                         retval = -EFAULT;
-                        spin_unlock_irqrestore(fifo_sp,cpuflags);   
+                        spin_unlock_irqrestore(fifo_sp,cpuflags);
                         break;
-                    }                    
+                    }
                     kfifo_out(fifo, buf, pkt_len);
                 //} else {
-                //    DebugPrint(ERROR, DBG_INIT,"@@@@read rx err: data not available, kfifo_len (%d),  sizeof(RXBI_STRUC)=%d, sizeof(unsigned int)=%d\n", 
+                //    DebugPrint(ERROR, DBG_INIT,"@@@@read rx err: data not available, kfifo_len (%d),  sizeof(RXBI_STRUC)=%d, sizeof(unsigned int)=%d\n",
                 //        kfifo_len(fifo),sizeof(RXBI_STRUC),sizeof(unsigned int)  );
-                    
+
                //     retval = -EFAULT;
-               //     spin_unlock_irqrestore(fifo_sp,cpuflags);   
+               //     spin_unlock_irqrestore(fifo_sp,cpuflags);
                //     break;
                // }
-                spin_unlock_irqrestore(fifo_sp,cpuflags);   
-                
-                DebugPrint(TRACE, DBG_INIT,"op == tr_rx_packet, rxbi.Len=0x%x, rxbi.ScoSeq = 0x%x, pkt_len=%d, buf[0]=0x%x, buf[1]=0x%x, buf[2]=0x%x, buf[3]=0x%x, buf[4]=0x%x\n", 
+                spin_unlock_irqrestore(fifo_sp,cpuflags);
+
+                DebugPrint(TRACE, DBG_INIT,"op == tr_rx_packet, rxbi.Len=0x%x, rxbi.ScoSeq = 0x%x, pkt_len=%d, buf[0]=0x%x, buf[1]=0x%x, buf[2]=0x%x, buf[3]=0x%x, buf[4]=0x%x\n",
                     rxbi.Len, rxbi.ScoSeq, pkt_len, buf[0], buf[1], buf[2], buf[3], buf[4]);
-                
+
                 if (copy_to_user((void *)(trctl.payload + offsetof(struct rtbth_rx_ctrl, rxbi)), &rxbi, sizeof(rxbi))){
                     retval = -EFAULT;
                     DebugPrint(ERROR, DBG_INIT,"copy_to_user failed at %d\n", __LINE__);
@@ -1763,48 +1763,48 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                     retval = -EFAULT;
                     DebugPrint(ERROR, DBG_INIT,"copy_to_user failed at %d\n", __LINE__);
                     break;
-                } 
-                                
+                }
+
                 if (copy_to_user((void *)(trctl.payload + offsetof(struct rtbth_rx_ctrl, len_pkt)), &pkt_len, sizeof(pkt_len))){
                     retval = -EFAULT;
                     DebugPrint(ERROR, DBG_INIT,"copy_to_user failed at %d\n", __LINE__);
                     break;
-                } 
+                }
 
                 if (copy_from_user(&buf_addr, (void *)(trctl.payload + offsetof(struct rtbth_rx_ctrl, pkt)), sizeof(unsigned char *))) {
                     retval = -EFAULT;
                     DebugPrint(ERROR, DBG_INIT,"copy_from_user failed at %d\n", __LINE__);
                     break;
-                } 
+                }
 
                 if (copy_to_user((void *)(buf_addr), &buf, pkt_len))
                 {
                     retval = -EFAULT;
                     DebugPrint(ERROR, DBG_INIT,"copy_to_user failed at %d\n", __LINE__);
                     break;
-                } 
+                }
                 break;
             } else {
                  DebugPrint(ERROR, DBG_INIT,"Invalid tx rx op at %d\n", __LINE__);
             }
         }while(0);
 
-            
+
         break;
-         
+
         case RTBTH_IOCSYNC:
             do {
                 sync_wq_flag = 1;
-                wake_up_interruptible(&sync_wq);             
+                wake_up_interruptible(&sync_wq);
             }while(0);
         break;
 
         case RTBTH_IOCTST:
             #if 0
-        do { 
+        do {
             unsigned int req;
             unsigned int res;
-            
+
             if (copy_from_user(&req, (void *)arg, sizeof(req))) {
                 retval = -EFAULT;
                 DebugPrint(ERROR, DBG_INIT,"copy_from_user failed at %d\n", __LINE__);
@@ -1840,7 +1840,7 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                 if(dmac.dmac_op == 0){
                     RtbtResetPDMA(gpAd);
                 }else if(dmac.dmac_op == 1){
-                    BthEnableRxTx(gpAd);        
+                    BthEnableRxTx(gpAd);
                 }else if(dmac.dmac_op == 2){
                     DebugPrint(TRACE, DBG_MISC, "%s:kfifo reset ==>\n", __func__);
                     kfifo_reset(gpAd->acl_fifo);
@@ -1855,7 +1855,7 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                 }
             }while(0);
             break;
-#if 1            
+#if 1
         case RTBTH_IOCRMODE:
             do {
                 int mode = 0;
@@ -1867,12 +1867,12 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                 }
                 if(mode)
                     pollm = 1;
-                else 
-                    pollm = 0;                
+                else
+                    pollm = 0;
                 DebugPrint(INFO, DBG_INIT,"Set Poll Mode = %d\n", pollm);
             }while(0);
             break;
-#endif            
+#endif
         default:
             retval = -EFAULT;
         break;
@@ -1951,8 +1951,8 @@ int rtbth_us_init(void *pdata)
 
     DebugPrint(TRACE, DBG_INIT,"%s driver(major %d) installed.\n", RTBTH_US_DRIVER_NAME, rtbth_us_maj);
 
-    //return 0;    
-#if 1 
+    //return 0;
+#if 1
 
     pAd = (RTBTH_ADAPTER *)pdata;
     gpAd = pAd;
@@ -1963,7 +1963,7 @@ int rtbth_us_init(void *pdata)
     RB_INIT(&pAd->rFreeOpQ,   STP_OP_BUF_SIZE);
     RB_INIT(&pAd->rActiveOpQ, STP_OP_BUF_SIZE);
     /* Put all to free Q */
-    for (i = 0; i < STP_OP_BUF_SIZE; i++) 
+    for (i = 0; i < STP_OP_BUF_SIZE; i++)
     {
          osal_signal_init(&(pAd->arQue[i].signal));
          _rtbth_us_put_op(pAd, &pAd->rFreeOpQ, &(pAd->arQue[i]));
@@ -1971,18 +1971,18 @@ int rtbth_us_init(void *pdata)
     pAd->PSMd.pThreadData = (VOID *)pAd;
     pAd->PSMd.pThreadFunc = (VOID *)_rtbth_us_proc;
 
-#define RTBTH_US_THREAD_NAME "rtbth_us"    
+#define RTBTH_US_THREAD_NAME "rtbth_us"
     memcpy(pAd->PSMd.threadName, RTBTH_US_THREAD_NAME, strlen(RTBTH_US_THREAD_NAME));
 
     ret = osal_thread_create(&pAd->PSMd);
-    if (ret < 0) 
+    if (ret < 0)
     {
         DebugPrint(TRACE, DBG_INIT,"osal_thread_create fail...\n");
         goto ERR_EXIT5;
     }
 
     //init_waitqueue_head(&pAd->wait_wmt_q);
-#define STP_PSM_WAIT_EVENT_TIMEOUT        6000    
+#define STP_PSM_WAIT_EVENT_TIMEOUT        6000
     pAd->wait_wmt_q.timeoutValue = STP_PSM_WAIT_EVENT_TIMEOUT;
     osal_event_init(&pAd->wait_wmt_q);
 
@@ -1993,9 +1993,9 @@ int rtbth_us_init(void *pdata)
          DebugPrint(TRACE, DBG_INIT,"osal_thread_run FAILS\n");
         goto ERR_EXIT6;
     }
-    
+
 #define SZ_EVT_FIFO 64*4        //entry * entry size
-#define SZ_HCI_FIFO 64*512     
+#define SZ_HCI_FIFO 64*512
 #define SZ_ACL_FIFO 64*512
 #define SZ_SCO_FIFO 64*512
 #define SZ_RX_FIFO  64*512
@@ -2022,7 +2022,7 @@ int rtbth_us_init(void *pdata)
     if(ret < 0){
        //add error handling
     }
-    
+
     pAd->sco_fifo = kzalloc(sizeof(struct kfifo), GFP_ATOMIC);
     ret = kfifo_alloc(pAd->sco_fifo, SZ_SCO_FIFO, GFP_ATOMIC);
     if(ret < 0){
@@ -2034,18 +2034,18 @@ int rtbth_us_init(void *pdata)
     if(ret < 0){
        //add error handling
     }
-    
+
     return 0;
-    
+
 ERR_EXIT6:
 
     ret = osal_thread_destroy(&pAd->PSMd);
     if(ret < 0)
     {
          DebugPrint(TRACE, DBG_INIT,"osal_thread_destroy FAILS\n");
-        goto ERR_EXIT5;   
+        goto ERR_EXIT5;
     }
-    
+
 ERR_EXIT5:
     return 0;
 #endif
@@ -2075,7 +2075,7 @@ int rtbth_us_deinit(void *pdata)
 //    del_timer_sync(&pAd->tst_evt_timer_hci);
 //    del_timer_sync(&pAd->tst_evt_timer_acl);
 //    del_timer_sync(&pAd->tst_evt_timer_sco);
-    
+
     if(!pAd){
         return -1;
     }
@@ -2090,11 +2090,11 @@ int rtbth_us_deinit(void *pdata)
     kfree(pAd->sco_fifo);
     kfifo_free(pAd->rx_fifo);
     kfree(pAd->rx_fifo);
-    
+
     ret = osal_thread_destroy(&pAd->PSMd);
     if(ret < 0)
     {
-         DebugPrint(TRACE, DBG_INIT,"osal_thread_destroy FAILS\n"); 
+         DebugPrint(TRACE, DBG_INIT,"osal_thread_destroy FAILS\n");
     }
     osal_unsleepable_lock_deinit(&pAd->wq_spinlock);
 #endif
@@ -2105,6 +2105,6 @@ int rtbth_us_deinit(void *pdata)
     unregister_chrdev_region(dev, rtbth_us_devs);
 
     DebugPrint(TRACE, DBG_INIT,"%s driver removed.\n", RTBTH_US_DRIVER_NAME);
-    
+
     return 0;
 }
