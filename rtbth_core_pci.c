@@ -35,10 +35,14 @@
 #ifdef OS_ABL_SUPPORT
 /* struct pci_device_id *rtbt_pci_ids = NULL; */
 #else
-static const struct pci_device_id rtbt_pci_ids[]  = {
-	{PCI_DEVICE(0x1814, 0x3298)},
-	/* do not remove the last entry */
-	{}
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0)
+static const struct pci_device_id rtbt_pci_ids[] __devinitdata = {
+#else
+static const struct pci_device_id rtbt_pci_ids[] = {
+#endif
+    {PCI_DEVICE(0x1814, 0x3298)},
+    /* do not remove the last entry */
+    {}
 };
 MODULE_DEVICE_TABLE(pci, rtbt_pci_ids);
 #endif // OS_ABL_SUPPORT //
@@ -105,8 +109,12 @@ static int rtbt_pci_resume(struct pci_dev *pdev)
 }
 #endif /* CONFIG_PM */
 
-static int rtbt_pci_probe(struct pci_dev *pdev,
-					const struct pci_device_id *id)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0)
+static int __devinit rtbt_pci_probe(struct pci_dev *pdev,
+                                    const struct pci_device_id *id)
+#else
+static int rtbt_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+#endif
 {
 	const char *print_name;
 	struct rtbt_os_ctrl *os_ctrl;
@@ -232,7 +240,11 @@ err_out_disable_dev:
 	return -1;
 }
 
-static void  rtbt_pci_remove(struct pci_dev *pdev)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0)
+static void __devexit rtbt_pci_remove(struct pci_dev *pdev)
+#else
+static void rtbt_pci_remove(struct pci_dev *pdev)
+#endif
 {
 	struct hci_dev *hci_dev = (struct hci_dev *)pci_get_drvdata(pdev);
 	struct rtbt_os_ctrl *os_ctrl;
@@ -294,19 +306,21 @@ static void  rtbt_pci_remove(struct pci_dev *pdev)
 
 
 static struct pci_driver rtbt_pci_driver = {
-	.name = "rtbt",
+    .name = "rtbt",
 #ifndef OS_ABL_SUPPORT
-	.id_table = rtbt_pci_ids,
+    .id_table = rtbt_pci_ids,
 #endif /* OS_ABL_SUPPORT */
-	.probe = rtbt_pci_probe,
-#if LINUX_VERSION_CODE >= 0x20412
-	.remove = (rtbt_pci_remove),
+    .probe = rtbt_pci_probe,
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,4,12)
+    .remove = __devexit(rtbt_pci_remove),
+#elif LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0)
+    .remove = __devexit_p(rtbt_pci_remove),
 #else
-	.remove = (rtbt_pci_remove),
+    .remove = rtbt_pci_remove,
 #endif
 #ifdef CONFIG_PM
-	.suspend = rtbt_pci_suspend,
-	.resume = rtbt_pci_resume,
+    .suspend = rtbt_pci_suspend,
+    .resume = rtbt_pci_resume,
 #endif /* CONFIG_PM */
 };
 
