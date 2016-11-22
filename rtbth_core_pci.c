@@ -53,58 +53,49 @@ int rtbth_rx_packet(void *pdata, RXBI_STRUC rxbi, void *buf, unsigned int len);
 static int rtbt_pci_suspend(struct pci_dev *pdev, pm_message_t state)
 {
     struct hci_dev *hci_dev = (struct hci_dev *)pci_get_drvdata(pdev);
-	struct rtbt_os_ctrl *os_ctrl;
-
-    printk("-->%s(): pm_message_state=%d\n", __FUNCTION__, state.event);
-
-	if (hci_dev == NULL){
-		printk("%s(): pci_get_drvdata failed!\n", __FUNCTION__);
-		return -1;
-	}
-
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
-    os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hci_dev);
-#else
-    os_ctrl = (struct rtbt_os_ctrl *)(hci_dev->driver_data);
-#endif
-	if (os_ctrl == NULL) {
-		printk("%s(): hci_dev->driver_data is NULL!\n", __FUNCTION__);
-		return -1;
-	}
-
-//msleep(10000);
-//    rtbt_hps_iface_detach(os_ctrl);
-//    os_ctrl->hps_ops->suspend(os_ctrl->dev_ctrl);
-	printk("<--%s()\n", __FUNCTION__);
-	return 0;
-}
-
-
-static int rtbt_pci_resume(struct pci_dev *pdev)
-{
-    struct hci_dev *hci_dev = (struct hci_dev *)pci_get_drvdata(pdev);
     struct rtbt_os_ctrl *os_ctrl;
-
-    printk("-->%s()\n", __FUNCTION__);
-
+    BT_INFO("-->%s(): pm_message_state=%d", __FUNCTION__, state.event);
     if (hci_dev == NULL){
-        printk("%s(): pci_get_drvdata failed!\n", __FUNCTION__);
+        BT_ERR("%s(): pci_get_drvdata failed!", __FUNCTION__);
         return -1;
     }
-
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hci_dev);
 #else
     os_ctrl = (struct rtbt_os_ctrl *)(hci_dev->driver_data);
 #endif
     if (os_ctrl == NULL) {
-        printk("%s(): hci_dev->driver_data is NULL!\n", __FUNCTION__);
+        BT_ERR("%s(): hci_dev->driver_data is NULL!", __FUNCTION__);
         return -1;
     }
+//msleep(10000);
+//    rtbt_hps_iface_detach(os_ctrl);
+//    os_ctrl->hps_ops->suspend(os_ctrl->dev_ctrl);
+    BT_INFO("<--%s()", __FUNCTION__);
+    return 0;
+}
 
+static int rtbt_pci_resume(struct pci_dev *pdev)
+{
+    struct hci_dev *hci_dev = (struct hci_dev *)pci_get_drvdata(pdev);
+    struct rtbt_os_ctrl *os_ctrl;
+    BT_INFO("-->%s()", __FUNCTION__);
+    if (hci_dev == NULL){
+        BT_ERR("%s(): pci_get_drvdata failed!", __FUNCTION__);
+        return -1;
+    }
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
+    os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hci_dev);
+#else
+    os_ctrl = (struct rtbt_os_ctrl *)(hci_dev->driver_data);
+#endif
+    if (os_ctrl == NULL) {
+        BT_ERR("%s(): hci_dev->driver_data is NULL!", __FUNCTION__);
+        return -1;
+    }
  //   os_ctrl->hps_ops->resume(os_ctrl->dev_ctrl);
  //   rtbt_hps_iface_attach(os_ctrl);
-    printk("<--%s()\n", __FUNCTION__);
+    BT_INFO("<--%s()", __FUNCTION__);
     return 0;
 }
 #endif /* CONFIG_PM */
@@ -122,11 +113,11 @@ static int rtbt_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	void __iomem *csr_addr = NULL;
 	int rv;
 
-	printk("===> %s():probe for device(Vendor=0x%x, Device=0x%p)\n",
+	BT_INFO("-->%s(): probe for device(Vendor=0x%x, Device=0x%p)",
 			__FUNCTION__, pdev->vendor, &pdev->device);
 
 	if (!id->driver_data) {
-		printk("pci_device_id->driver_data is NULL!\n");
+		BT_ERR("pci_device_id->driver_data is NULL!");
 		return -1;
 	}
 
@@ -134,13 +125,13 @@ static int rtbt_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	if (!(dev_ops->dev_ctrl_init && dev_ops->dev_ctrl_deinit &&
 		dev_ops->dev_resource_init && dev_ops->dev_resource_deinit &&
 		dev_ops->dev_hw_init && dev_ops->dev_hw_deinit)) {
-	    printk("dev_ops have null function pointer!\n");
+	    BT_ERR("dev_ops have null function pointer!");
 	    return -1;
 	}
 
 	rv = pci_enable_device(pdev);
 	if (rv) {
-		printk("call pci_enable_dev failed(%d)\n", rv);
+		BT_ERR("call pci_enable_dev failed(%d)", rv);
 		return rv;
 	}
 
@@ -150,7 +141,7 @@ static int rtbt_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	print_name = pdev->slot_name;
 #endif
 	if ((rv = pci_request_region(pdev, 0, print_name)) != 0) {
-		printk("Request PCI resource failed(%d)\n", rv);
+		BT_ERR("Request PCI resource failed(%d)", rv);
 		goto err_out_disable_dev;
 	}
 
@@ -161,12 +152,12 @@ static int rtbt_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	csr_addr = ioremap(pci_resource_start(pdev, 0), pci_resource_len(pdev, 0));
 #endif
 	if (!csr_addr) {
-		printk("ioremap failed, region 0x%lx @ 0x%lX\n",
+		BT_ERR("ioremap failed, region 0x%lx @ 0x%lX",
 				(unsigned long)pci_resource_start(pdev, 0),
 				(unsigned long)pci_resource_len(pdev, 0));
 		goto err_out_free_res;
 	} else {
-		printk("%s():PCI Dev(%s) get resource at 0x%lx,VA 0x%lx,IRQ %d.\n",
+		BT_WARN("%s(): PCI Dev(%s) get resource at 0x%lx,VA 0x%lx,IRQ %d.",
 				__FUNCTION__, print_name,
 				(ULONG)pci_resource_start(pdev, 0),
 				(ULONG)csr_addr, pdev->irq);
@@ -176,14 +167,14 @@ static int rtbt_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	// TODO: Shiang, does our chip support mwi??
 	rv = pci_set_mwi(pdev);
 	if (rv != 0) {
-		printk("set MWI failed(%d)\n", rv);
+		BT_ERR("set MWI failed(%d)", rv);
 		goto err_out_free_res;
 	}
 
 	pci_set_master(pdev);
 
 	/* device control block initialization */
-	printk("call dev_ops->dev_ctrl_init!\n");
+	BT_WARN("call dev_ops->dev_ctrl_init!");
 	if (dev_ops->dev_ctrl_init(&os_ctrl, csr_addr))
 		goto err_out_free_res;
 
@@ -191,7 +182,7 @@ static int rtbt_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 //    rtbth_us_init(os_ctrl->dev_ctrl);
 
-	printk("call dev_ops->dev_resource_init!\n");
+	BT_WARN("call dev_ops->dev_resource_init!");
 	if (dev_ops->dev_resource_init(os_ctrl))
 		goto err_dev_ctrl;
 
@@ -206,7 +197,7 @@ static int rtbt_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	if (rtbt_hps_iface_attach(os_ctrl))
 		goto err_hps_iface;
 #endif
-	printk("<---%s():Sucess\n", __FUNCTION__);
+	BT_INFO("<--%s()", __FUNCTION__);
 	return 0;
 
 	// TODO: Shiang, free the resource here.
@@ -214,11 +205,11 @@ err_hps_iface:
 	rtbt_hps_iface_deinit(RAL_INF_PCI, pdev, os_ctrl);
 
 err_dev_resource:
-	printk("err: call rtbt_dev_resource_deinit()\n");
+	BT_ERR("call rtbt_dev_resource_deinit()");
 	dev_ops->dev_resource_deinit(os_ctrl);
 
 err_dev_ctrl:
-	printk("err: call rtbt_dev_ctrl_deinit()\n");
+	BT_ERR("call rtbt_dev_ctrl_deinit()");
 	dev_ops->dev_ctrl_deinit(os_ctrl);
 
 err_out_free_res:
@@ -236,7 +227,7 @@ err_out_free_res:
 err_out_disable_dev:
 	pci_disable_device(pdev);
 
-	printk("<---%s():fail\n", __FUNCTION__);
+	BT_ERR("<--%s(): fail", __FUNCTION__);
 	return -1;
 }
 
@@ -252,7 +243,7 @@ static void rtbt_pci_remove(struct pci_dev *pdev)
 	void __iomem *csr_addr;
 
 	if (hci_dev == NULL){
-		printk("%s(): pci_get_drvdata failed!\n", __FUNCTION__);
+		BT_ERR("%s(): pci_get_drvdata failed!", __FUNCTION__);
 		return;
 	}
 
@@ -262,12 +253,12 @@ static void rtbt_pci_remove(struct pci_dev *pdev)
     os_ctrl = (struct rtbt_os_ctrl *)(hci_dev->driver_data);
 #endif
 	if (os_ctrl == NULL) {
-		printk("%s(): hci_dev->driver_data is NULL!\n", __FUNCTION__);
+		BT_ERR("%s(): hci_dev->driver_data is NULL!", __FUNCTION__);
 		return;
 	}
 
 	csr_addr = os_ctrl->if_ops.pci_ops.csr_addr;
-	printk("%s():csr_addr=0x%lx!\n", __FUNCTION__,
+	BT_WARN("%s(): csr_addr=0x%lx!", __FUNCTION__,
 			(unsigned long)os_ctrl->if_ops.pci_ops.csr_addr);
 
 #if 0
@@ -301,7 +292,7 @@ static void rtbt_pci_remove(struct pci_dev *pdev)
 	pci_release_region(pdev, 0);
 	pci_disable_device(pdev);
 
-	printk("Exit from rtbt_pci_remove!\n");
+	BT_INFO("<--%s()", __FUNCTION__);
 }
 
 
@@ -358,12 +349,10 @@ BthIsr(int irq, void *dev_instance, struct pt_regs *regs)
 	struct rtbt_os_ctrl *os_ctrl;
 	int retval = -1;
 
-//printk("-->Into BthIsr()\n");
-
 	ASSERT(hdev);
 
 	if (!test_bit(HCI_RUNNING, &hdev->flags)) {
-		printk("%s():-->HCI_RUNNING not set!\n", __FUNCTION__);
+		BT_ERR("%s(): HCI_RUNNING not set!", __FUNCTION__);
 		goto done;
 	}
 
@@ -380,12 +369,11 @@ BthIsr(int irq, void *dev_instance, struct pt_regs *regs)
 		else
 		{
 			if (os_ctrl)
-				printk("Err, Shiang, os_ctrl->if_ops.pci_ops.isr=0x%p\n", os_ctrl->if_ops.pci_ops.isr);
+				BT_ERR("os_ctrl->if_ops.pci_ops.isr=0x%p", os_ctrl->if_ops.pci_ops.isr);
 		}
 	}
 
 done:
-	//printk("<--BthIsr Done, retval=%d\n", retval);
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0)
 	return  IRQ_HANDLED;
@@ -405,9 +393,9 @@ int RtmpOSIRQRequest(IN void *if_dev, void *dev_id)
 	retval = request_irq(pdev->irq, BthIsr, SA_SHIRQ, hdev->name, hdev);
 #endif
 	if (retval != 0)
-		printk("RT_BT: request_irq (IRQ=%d) ERROR(%d)\n", pdev->irq, retval);
+		BT_ERR("RT_BT: request_irq (IRQ=%d) ERROR(%d)", pdev->irq, retval);
 	else
-		printk("%s(): request_irq (IRQ=%d)done, isr_handler=0x%lx!\n", __FUNCTION__, pdev->irq, (ULONG)BthIsr);
+		BT_WARN("%s(): request_irq (IRQ=%d)done, isr_handler=0x%lx!", __FUNCTION__, pdev->irq, (ULONG)BthIsr);
 
 	return retval;
 
@@ -479,7 +467,7 @@ static int rtbt_linux_pci_ids_create(struct rtbt_dev_entry *pRalDevList)
 loop:
 	pDevIDList = pRalDevList->pDevIDList;
 	while(pDevIDList){
-		printk("RTBT_Tb:vendor=0x%x, device=0x%x\n", pDevIDList->vid, pDevIDList->pid);
+		BT_WARN("RTBT_Tb: vendor=0x%x, device=0x%x", pDevIDList->vid, pDevIDList->pid);
 		if (pDevIDList->pid && pDevIDList->vid) {
 			if (phase == 1)
 				size++;
@@ -490,7 +478,7 @@ loop:
 				pTbPtr->subvendor = PCI_ANY_ID;
 				pTbPtr->subdevice = PCI_ANY_ID;
 				pTbPtr->driver_data = (unsigned long)pRalDevList->dev_ops;
-				printk("Convert: vendor=0x%x, device=0x%x\n", pTbPtr->vendor, pTbPtr->device);
+				BT_WARN("Convert: vendor=0x%x, device=0x%x", pTbPtr->vendor, pTbPtr->device);
 				pTbPtr++;
 			}
 			pDevIDList++;
@@ -505,7 +493,7 @@ loop:
 			if ((pIdTable = kmalloc(size, GFP_KERNEL)) == NULL)
 				return -1;
 			memset(pIdTable, 0, size);
-			printk("DynamicAlloc pci_device_id table at 0x%p with size %d\n", pIdTable, size);
+			BT_WARN("DynamicAlloc pci_device_id table at 0x%p with size %d", pIdTable, size);
 			pTbPtr = pIdTable;
 			pRalDevList->os_private = pIdTable;
 			phase = 2;
@@ -516,7 +504,7 @@ loop:
 	if (pRalDevList->os_private) {
 		pTbPtr = (struct pci_device_id *)pRalDevList->os_private;
 		while(pTbPtr->vendor != 0){
-			printk("pci_device_id: vendor=0x%x, device=0x%x\n", pTbPtr->vendor, pTbPtr->device);
+			BT_WARN("pci_device_id: vendor=0x%x, device=0x%x", pTbPtr->vendor, pTbPtr->device);
 			pTbPtr++;
 		}
 	}
@@ -538,12 +526,12 @@ int rtbt_iface_pci_hook(struct rtbt_dev_entry *pIdTb)
 
 	rtbt_pci_driver.id_table = (struct pci_device_id *)pIdTb->os_private;
 	if (rtbt_pci_driver.id_table  == NULL){
-		printk("id_table is NULL!\n");
+		BT_ERR("id_table is NULL!");
 		return -1;
 	}
 #else
 	//rtbt_pci_driver.id_table = rtbt_pci_ids;
-	//printk("rtbt_iface_pci_hook! IdCnt=%d!rtbt_pci_ids=0x%x\n", IdCnt, (ULONG)rtbt_pci_ids);
+	//BT_WARN("rtbt_iface_pci_hook! IdCnt=%d!rtbt_pci_ids=0x%x\n", IdCnt, (ULONG)rtbt_pci_ids);
 #endif
 
 		return pci_register_driver(&rtbt_pci_driver);
@@ -561,7 +549,7 @@ int rtbt_iface_pci_unhook(struct rtbt_dev_entry *pIdTb)
 	rtbt_pci_driver.id_table = NULL;
 #endif /* OS_ABL_SUPPORT */
 
-	printk("remove rtbt_pci_driver done!\n");
+	BT_INFO("remove rtbt_pci_driver done!");
 	return 0;
 }
 

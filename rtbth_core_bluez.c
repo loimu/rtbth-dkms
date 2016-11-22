@@ -56,28 +56,28 @@ static inline void rtbt_set_pkt_type(struct sk_buff *skb, unsigned char type)
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,13,0)
 int rtbt_hci_dev_ioctl(struct hci_dev *hdev, unsigned int cmd, unsigned long arg)
 {
-    printk("%s(dev=0x%lx): ioctl cmd=0x%x!\n", __FUNCTION__, (ULONG)hdev, cmd);
+    BT_WARN("%s(dev=0x%lx): ioctl cmd=0x%x", __FUNCTION__, (ULONG)hdev, cmd);
     return -ENOIOCTLCMD;
 }
 #endif
 
 void rtbt_hci_dev_notify(struct hci_dev *hdev, unsigned int evt)
 {
-    printk("%s(dev=0x%lx): evt=0x%x!\n", __FUNCTION__, (ULONG)hdev, evt);
+    BT_WARN("%s(dev=0x%lx): evt=0x%x", __FUNCTION__, (ULONG)hdev, evt);
     return;
 }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0)
 void rtbt_hci_dev_destruct(struct hci_dev *hdev)
 {
-    printk("-->%s(): dev=0x%lx!\n", __FUNCTION__, (ULONG)hdev);
+    BT_WARN("%s(dev=0x%lx)", __FUNCTION__, (ULONG)hdev);
     return;
 }
 #endif
 
 int rtbt_hci_dev_flush(struct hci_dev *hdev)
 {
-    printk("%s(dev=0x%lx)!\n", __FUNCTION__, (ULONG)hdev);
+    BT_WARN("%s(dev=0x%lx)", __FUNCTION__, (ULONG)hdev);
     return 0;
 }
 
@@ -119,7 +119,7 @@ int rtbt_hci_dev_send(struct sk_buff *skb)
     if ((!hps_ops->hci_cmd) ||
         (!hps_ops->hci_acl_data) ||
         (!hps_ops->hci_sco_data)) {
-        printk("Err, Null Handler!hci_cmd=0x%p, acl_data=0x%p, sco_data=0x%p!\n",
+        BT_ERR("Null Handler! hci_cmd=0x%p, acl_data=0x%p, sco_data=0x%p!",
                 hps_ops->hci_cmd, hps_ops->hci_acl_data, hps_ops->hci_sco_data);
         kfree_skb(skb);
         return -1;
@@ -137,7 +137,7 @@ int rtbt_hci_dev_send(struct sk_buff *skb)
                 hdev->stat.acl_tx++;
             break;
         case HCI_SCODATA_PKT:
-            printk("-->%s():sco len=%d,time=0x%lx\n", __FUNCTION__, skb->len, jiffies);
+            BT_WARN("%s(): sco len=%d,time=0x%lx", __FUNCTION__, skb->len, jiffies);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)
             os_ctrl->sco_tx_seq = bt_cb(skb)->l2cap.txseq;
 #elif LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
@@ -149,7 +149,7 @@ int rtbt_hci_dev_send(struct sk_buff *skb)
             status = hps_ops->hci_sco_data(os_ctrl->dev_ctrl, skb->data, skb->len);
             if(hdev && (status == 0))
                 hdev->stat.sco_tx++;
-            printk("<--%s():sco done, time=0x%lx\n", __FUNCTION__, jiffies);
+            BT_WARN("%s(): sco done, time=0x%lx", __FUNCTION__, jiffies);
             break;
         case HCI_VENDOR_PKT:
             break;
@@ -201,7 +201,7 @@ int rtbt_hci_dev_receive(void *bt_dev, int pkt_type, char *buf, int len)
     rtbt_set_pkt_type(skb, pkt_type);
     memcpy(skb_put(skb, len), buf, len);
     if (pkt_type == HCI_SCODATA_PKT)
-        printk("-->%s(): send sco data to OS, time=0x%lx\n", __FUNCTION__, jiffies);
+        BT_WARN("-->%s(): send sco data to OS, time=0x%lx", __FUNCTION__, jiffies);
     hdev = (struct hci_dev *)skb->dev;
     if(hdev){
         hdev->stat.byte_rx += len;
@@ -223,7 +223,7 @@ int rtbt_hci_dev_open(struct hci_dev *hdev)
 #else
     struct rtbt_os_ctrl *os_ctrl = (struct rtbt_os_ctrl *)hdev->driver_data;
 #endif
-    printk("-->%s()\n", __FUNCTION__);
+    BT_DBG("-->%s()", __FUNCTION__);
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,4,0)
     if (test_bit(HCI_RUNNING, &hdev->flags))
         return 0;
@@ -234,7 +234,7 @@ int rtbt_hci_dev_open(struct hci_dev *hdev)
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,4,0)
         clear_bit(HCI_RUNNING, &hdev->flags);
 #endif
-        printk("Error: os_ctrl->hps_ops->dev_open is null\n");
+        BT_ERR("os_ctrl->hps_ops->dev_open is null");
     }
     if (status == 0) {
         os_ctrl->sco_tx_seq = -1;
@@ -242,7 +242,7 @@ int rtbt_hci_dev_open(struct hci_dev *hdev)
         set_bit(HCI_RUNNING, &hdev->flags);
 #endif
     }
-    printk("<--%s(), status=%d\n", __FUNCTION__, status);
+    BT_DBG("<--%s(), status=%d", __FUNCTION__, status);
     return status;
 }
 
@@ -254,18 +254,18 @@ int rtbt_hci_dev_close(struct hci_dev *hdev)
 #else
     struct rtbt_os_ctrl *os_ctrl = (struct rtbt_os_ctrl *)hdev->driver_data;
 #endif
-    printk("--->%s()\n", __FUNCTION__);
+    BT_DBG("-->%s()", __FUNCTION__);
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,4,0)
     if (!test_and_clear_bit(HCI_RUNNING, &(hdev->flags))){
-        printk("%s():Directly return due to hdev->flags=0x%lx\n", __FUNCTION__, hdev->flags);
+        BT_WARN("%s(): Directly return due to hdev->flags=0x%lx", __FUNCTION__, hdev->flags);
         return 0;
     }
 #endif
     if (os_ctrl && os_ctrl->hps_ops && os_ctrl->hps_ops->close)
         status = os_ctrl->hps_ops->close(os_ctrl->dev_ctrl);
     else
-        printk("%s():os_ctrl->hps_ops->close is null!\n", __FUNCTION__);
-    printk("<---%s()\n", __FUNCTION__);
+        BT_ERR("%s(): os_ctrl->hps_ops->close is null!", __FUNCTION__);
+    BT_DBG("<--%s()", __FUNCTION__);
     return status;
 }
 
@@ -286,7 +286,7 @@ int rtbt_hps_iface_resume(IN struct rtbt_os_ctrl *os_ctrl)
 int rtbt_hps_iface_detach(IN struct rtbt_os_ctrl *os_ctrl)
 {
     struct hci_dev *hdev = os_ctrl->bt_dev;
-    printk("--->%s()\n", __FUNCTION__);
+    BT_INFO("-->%s()", __FUNCTION__);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     hci_dev_hold(hdev);
 #else
@@ -294,7 +294,7 @@ int rtbt_hps_iface_detach(IN struct rtbt_os_ctrl *os_ctrl)
 #endif
     /* un-register HCI device */
     if (!hdev) {
-        printk("%s():os_ctrl(%p)->bt_dev is NULL\n", __FUNCTION__, os_ctrl);
+        BT_ERR("%s(): os_ctrl(%p)->bt_dev is NULL", __FUNCTION__, os_ctrl);
         return -1;
     }
     hci_unregister_dev(hdev);
@@ -303,14 +303,14 @@ int rtbt_hps_iface_detach(IN struct rtbt_os_ctrl *os_ctrl)
 #else
     __hci_dev_put(hdev);
 #endif
-    printk("<---%s():Success\n", __FUNCTION__);
+    BT_INFO("<--%s()", __FUNCTION__);
     return 0;
 }
 
 int rtbt_hps_iface_attach(IN struct rtbt_os_ctrl *os_ctrl)
 {
     struct hci_dev *hdev = os_ctrl->bt_dev;
-    printk("--->%s()\n", __FUNCTION__);
+    BT_INFO("-->%s()", __FUNCTION__);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     hci_dev_hold(hdev);
 #else
@@ -326,7 +326,7 @@ int rtbt_hps_iface_attach(IN struct rtbt_os_ctrl *os_ctrl)
 #else
     __hci_dev_put(hdev);
 #endif
-    printk("<---%s():Success\n", __FUNCTION__);
+    BT_INFO("<--%s()", __FUNCTION__);
     return 0;
 }
 
@@ -338,7 +338,7 @@ int rtbt_hps_iface_deinit(
     struct hci_dev *hdev;
     if (if_type == RAL_INF_PCI) {
         hdev = (struct hci_dev *)pci_get_drvdata(if_dev);
-        printk("%s():hciDev=0x%p\n", __FUNCTION__, hdev);
+        BT_WARN("%s(): hciDev=0x%p", __FUNCTION__, hdev);
     }
     else
         return FALSE;
@@ -354,7 +354,7 @@ int rtbt_hps_iface_init(
     IN struct rtbt_os_ctrl *os_ctrl)
 {
     struct hci_dev *hdev;
-    printk("-->%s(): if_type=%d\n", __FUNCTION__, if_type);
+    BT_INFO("-->%s(): if_type=%d", __FUNCTION__, if_type);
     /* Initialize HCI device */
     hdev = hci_alloc_dev();
     if (!hdev) {
@@ -412,6 +412,6 @@ int rtbt_hps_iface_init(
 #endif
     hdev->notify = rtbt_hci_dev_notify;
 
-    printk("<--%s():alloc hdev(0x%lx) done\n", __FUNCTION__, (ULONG)hdev);
+    BT_INFO("<--%s(): alloc hdev(0x%lx) done", __FUNCTION__, (ULONG)hdev);
     return 0;
 }
