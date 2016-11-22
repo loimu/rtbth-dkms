@@ -572,7 +572,7 @@ void ral_task_customize(
 	
 #ifndef KTHREAD_SUPPORT
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0)
-	//daemonize((PSTRING)&pOSTask->taskName[0]);
+	daemonize((PSTRING)&pOSTask->taskName[0]);
 
 	allow_signal(SIGTERM);
 	allow_signal(SIGKILL);
@@ -600,7 +600,7 @@ void ral_task_customize(
 
     /* signal that we've started the thread */
 	complete(&pOSTask->taskComplete);
-#endif
+#endif // KTHREAD_SUPPORT //
 }
 
 
