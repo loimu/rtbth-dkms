@@ -32,10 +32,14 @@
 #include <net/bluetooth/hci_core.h>
 #include "rt_linux.h"
 
+// BT_WARN macro is missing on older kernels
+#ifndef BT_WARN
+  #define BT_WARN BT_INFO
+#endif // BT_WARN //
 
-/* 
+/*
 	Following three definitions are defined in kernelSrc/include/net/bluetooth/hci.h,
-	But our code also has typedef enum for these three constants, so we undefine it 
+	But our code also has typedef enum for these three constants, so we undefine it
 	here to make compile.
 
 	For two module cases, this can ignore it.
@@ -56,6 +60,6 @@ int rtbt_hps_iface_resume(IN struct rtbt_os_ctrl *os_ctrl);
 int rtbt_hps_iface_attach(struct rtbt_os_ctrl *os_ctrl);
 int rtbt_hps_iface_detach(struct rtbt_os_ctrl *os_ctrl);
 
-	
+
 #endif // __HPS_BLUEZ_H //
 
