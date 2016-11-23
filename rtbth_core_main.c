@@ -31,7 +31,7 @@
 #include "rtbth_3298.h"
 #include "rtbt_ctrl.h"
 
-#define VERSION	"3.9.4.5"
+#define VERSION	"3.9.4.6"
 
 MODULE_AUTHOR("Ralink Tech.");
 MODULE_DESCRIPTION("Support for Ralink Bluetooth RT3290 Cards");
