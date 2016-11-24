@@ -302,7 +302,7 @@ static struct pci_driver rtbt_pci_driver = {
     .id_table = rtbt_pci_ids,
 #endif /* OS_ABL_SUPPORT */
     .probe = rtbt_pci_probe,
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,4,12)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,4,18)
     .remove = __devexit(rtbt_pci_remove),
 #elif LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0)
     .remove = __devexit_p(rtbt_pci_remove),
