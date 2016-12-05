@@ -22,7 +22,21 @@ sudo rfkill unblock bluetooth
 sudo pkill -2 rtbt
 sudo rmmod rtbth
 ```
+### Solving Sleep/Wakeup Issue ###
 
+If facing issues with bluetooth not functioning on wakeup (after sleep)
+then run the following script (note that admin access via sudo is needed)
+
+```sh
+sudo pkill -2 rtbt
+sleep 2
+sudo rmmod rtbth
+sleep 2
+sudo modprobe rtbth
+sleep 2
+sudo rfkill unblock bluetooth
+```
+One may need to work on the pauses depending on how long each step takes
 
 ### Blob issues: ###
 
