@@ -67,14 +67,6 @@ void rtbt_hci_dev_notify(struct hci_dev *hdev, unsigned int evt)
     return;
 }
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0)
-void rtbt_hci_dev_destruct(struct hci_dev *hdev)
-{
-    BT_WARN("%s(dev=0x%lx)", __FUNCTION__, (ULONG)hdev);
-    return;
-}
-#endif
-
 int rtbt_hci_dev_flush(struct hci_dev *hdev)
 {
     BT_WARN("%s(dev=0x%lx)", __FUNCTION__, (ULONG)hdev);
@@ -401,9 +393,6 @@ int rtbt_hps_iface_init(
     hdev->close = rtbt_hci_dev_close;
     hdev->flush = rtbt_hci_dev_flush;
     hdev->send = rtbt_hci_dev_send;
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0)
-    hdev->destruct = rtbt_hci_dev_destruct;
-#endif
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,13,0)
     hdev->ioctl = rtbt_hci_dev_ioctl;
 #endif
