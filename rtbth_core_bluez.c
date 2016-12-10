@@ -388,6 +388,7 @@ int rtbt_hps_iface_init(
     hci_set_drvdata(hdev, os_ctrl);
 #else
     hdev->driver_data = os_ctrl;
+    hdev->owner = THIS_MODULE;
 #endif
     hdev->open = rtbt_hci_dev_open;
     hdev->close = rtbt_hci_dev_close;
@@ -395,9 +396,6 @@ int rtbt_hps_iface_init(
     hdev->send = rtbt_hci_dev_send;
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,13,0)
     hdev->ioctl = rtbt_hci_dev_ioctl;
-#endif
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0)
-    hdev->owner = THIS_MODULE;
 #endif
     hdev->notify = rtbt_hci_dev_notify;
 
