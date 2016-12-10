@@ -120,12 +120,12 @@ int rtbt_hci_dev_send(struct sk_buff *skb)
     switch (pkt_type) {
         case HCI_COMMAND_PKT:
             status = hps_ops->hci_cmd(os_ctrl->dev_ctrl, skb->data, skb->len);
-            if(hdev && (status == 0))
+            if (hdev && (status == 0))
                 hdev->stat.cmd_tx++;
             break;
         case HCI_ACLDATA_PKT:
             status = hps_ops->hci_acl_data(os_ctrl->dev_ctrl, skb->data, skb->len);
-            if(hdev && (status == 0))
+            if (hdev && (status == 0))
                 hdev->stat.acl_tx++;
             break;
         case HCI_SCODATA_PKT:
@@ -139,7 +139,7 @@ int rtbt_hci_dev_send(struct sk_buff *skb)
 #endif
             os_ctrl->sco_time_hci = jiffies;
             status = hps_ops->hci_sco_data(os_ctrl->dev_ctrl, skb->data, skb->len);
-            if(hdev && (status == 0))
+            if (hdev && (status == 0))
                 hdev->stat.sco_tx++;
             BT_WARN("%s(): sco done, time=0x%lx", __FUNCTION__, jiffies);
             break;
@@ -147,7 +147,7 @@ int rtbt_hci_dev_send(struct sk_buff *skb)
             break;
     }
 
-    if(hdev && (status == 0))
+    if (hdev && (status == 0))
         hdev->stat.byte_tx += skb->len;
     else
         hdev->stat.err_tx++;
@@ -193,11 +193,10 @@ int rtbt_hci_dev_receive(void *bt_dev, int pkt_type, char *buf, int len)
     rtbt_set_pkt_type(skb, pkt_type);
     memcpy(skb_put(skb, len), buf, len);
     if (pkt_type == HCI_SCODATA_PKT)
-        BT_WARN("-->%s(): send sco data to OS, time=0x%lx", __FUNCTION__, jiffies);
+        BT_WARN("%s(): send sco data to OS, time=0x%lx", __FUNCTION__, jiffies);
     hdev = (struct hci_dev *)skb->dev;
-    if(hdev){
+    if (hdev)
         hdev->stat.byte_rx += len;
-    }
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,13,0)
     status = hci_recv_frame(hdev, skb);
@@ -284,7 +283,7 @@ int rtbt_hps_iface_detach(IN struct rtbt_os_ctrl *os_ctrl)
 #else
     __hci_dev_hold(hdev);
 #endif
-    /* un-register HCI device */
+    /* unregister HCI device */
     if (!hdev) {
         BT_ERR("%s(): os_ctrl(%p)->bt_dev is NULL", __FUNCTION__, os_ctrl);
         return -1;
