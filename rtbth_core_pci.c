@@ -54,7 +54,7 @@ static int rtbt_pci_suspend(struct pci_dev *pdev, pm_message_t state)
 {
     struct hci_dev *hci_dev = (struct hci_dev *)pci_get_drvdata(pdev);
     struct rtbt_os_ctrl *os_ctrl;
-    BT_INFO("-->%s(): pm_message_state=%d", __FUNCTION__, state.event);
+    BT_DBG("-->%s(): pm_message_state=%d", __FUNCTION__, state.event);
     if (hci_dev == NULL){
         BT_ERR("%s(): pci_get_drvdata failed!", __FUNCTION__);
         return -1;
@@ -71,7 +71,7 @@ static int rtbt_pci_suspend(struct pci_dev *pdev, pm_message_t state)
 //msleep(10000);
 //    rtbt_hps_iface_detach(os_ctrl);
 //    os_ctrl->hps_ops->suspend(os_ctrl->dev_ctrl);
-    BT_INFO("<--%s()", __FUNCTION__);
+    BT_DBG("<--%s()", __FUNCTION__);
     return 0;
 }
 
@@ -79,7 +79,7 @@ static int rtbt_pci_resume(struct pci_dev *pdev)
 {
     struct hci_dev *hci_dev = (struct hci_dev *)pci_get_drvdata(pdev);
     struct rtbt_os_ctrl *os_ctrl;
-    BT_INFO("-->%s()", __FUNCTION__);
+    BT_DBG("-->%s()", __FUNCTION__);
     if (hci_dev == NULL){
         BT_ERR("%s(): pci_get_drvdata failed!", __FUNCTION__);
         return -1;
@@ -95,7 +95,7 @@ static int rtbt_pci_resume(struct pci_dev *pdev)
     }
  //   os_ctrl->hps_ops->resume(os_ctrl->dev_ctrl);
  //   rtbt_hps_iface_attach(os_ctrl);
-    BT_INFO("<--%s()", __FUNCTION__);
+    BT_DBG("<--%s()", __FUNCTION__);
     return 0;
 }
 #endif /* CONFIG_PM */
