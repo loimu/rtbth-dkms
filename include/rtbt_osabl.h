@@ -224,7 +224,6 @@ struct rtbt_hps_ops{
 	int (*hci_sco_data)(void *dev_ctrl, void *buf, ULONG len);
 	int (*flush)(void *handle);
 	int (*ioctl)(void *handle, unsigned int cmd, unsigned long arg);
-	void (*destruct)(void *handle);
 	void (*notify)(void *handle, unsigned int evt);
 };
 
@@ -239,7 +238,7 @@ struct rtbt_os_ctrl{
 	void *dev_ctrl;
 	void *if_dev;
 	void *bt_dev;
-	
+
 	union rtbt_if_ops if_ops;
 	struct rtbt_dev_ops *dev_ops;
 	struct rtbt_hps_ops *hps_ops;
@@ -323,7 +322,7 @@ VOID KeInitializeDpc(
 	File related functions.
  *******************************************************************************/
 int ral_file_obj_init(
-	IN PSTRING FileName, 
+	IN PSTRING FileName,
 	IN RAL_FILE **pFileHd);
 
 int ral_file_open(RAL_FILE *pFileHd, RTBT_FILE_OP_MODE opMode);
@@ -379,7 +378,7 @@ int ral_task_deinit(
 
 int ral_task_attach(
 	IN KTHREAD *pTask,
-	IN RTBT_OS_TASK_CALLBACK fn, 
+	IN RTBT_OS_TASK_CALLBACK fn,
 	IN ULONG arg);
 
 void ral_task_customize(IN KTHREAD *pTask);
