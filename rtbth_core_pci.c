@@ -258,7 +258,7 @@ static void rtbt_pci_remove(struct pci_dev *pdev)
 	}
 
 	csr_addr = os_ctrl->if_ops.pci_ops.csr_addr;
-	BT_WARN("%s(): csr_addr=0x%lx!", __FUNCTION__,
+	BT_INFO("-->%s(): csr_addr=0x%lx!", __FUNCTION__,
 			(unsigned long)os_ctrl->if_ops.pci_ops.csr_addr);
 
 #if 0
