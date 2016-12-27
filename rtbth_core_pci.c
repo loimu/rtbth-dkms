@@ -135,11 +135,7 @@ static int rtbt_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		return rv;
 	}
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0)
 	print_name = pci_name(pdev);
-#else
-	print_name = pdev->slot_name;
-#endif
 	if ((rv = pci_request_region(pdev, 0, print_name)) != 0) {
 		BT_ERR("Request PCI resource failed(%d)", rv);
 		goto err_out_disable_dev;
@@ -302,9 +298,7 @@ static struct pci_driver rtbt_pci_driver = {
     .id_table = rtbt_pci_ids,
 #endif /* OS_ABL_SUPPORT */
     .probe = rtbt_pci_probe,
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,4,18)
-    .remove = __devexit(rtbt_pci_remove),
-#elif LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,8,0)
     .remove = __devexit_p(rtbt_pci_remove),
 #else
     .remove = rtbt_pci_remove,
@@ -374,10 +368,7 @@ BthIsr(int irq, void *dev_instance, struct pt_regs *regs)
 	}
 
 done:
-
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0)
 	return  IRQ_HANDLED;
-#endif
 }
 
 
@@ -405,12 +396,8 @@ int RtmpOSIRQRequest(IN void *if_dev, void *dev_id)
 int RtmpOSIRQRelease(IN void *if_dev, void *dev_id)
 {
 	struct pci_dev *pdev = if_dev;
-
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0)
 	synchronize_irq(pdev->irq);
-#endif
 	free_irq(pdev->irq, dev_id);
-
 	return 0;
 }
 

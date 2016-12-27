@@ -204,7 +204,7 @@ typedef struct _RTMP_OS_FS_INFO_
 
 
 typedef struct _RT_OS_LOCK{
-	
+
 
 }RT_OS_LOCK;
 
@@ -229,12 +229,7 @@ typedef struct _RT_OS_FILE{
 
 }RT_OS_FILE;
 
-
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0)
 #define IRQ_HANDLE_TYPE  irqreturn_t
-#else
-#define IRQ_HANDLE_TYPE  void
-#endif
 
 #endif // __RTBT_LINUX_H //
 

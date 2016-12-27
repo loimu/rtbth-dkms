@@ -552,12 +552,10 @@ NDIS_STATUS ral_task_kill(
 INT ral_task_notify_exit(
 	IN KTHREAD *pTask)
 {
-	RTBT_OS_TASK *pOSThread = (RTBT_OS_TASK *)pTask->pOSThread;
-
 #ifndef KTHREAD_SUPPORT
+	RTBT_OS_TASK *pOSThread = (RTBT_OS_TASK *)pTask->pOSThread;
 	complete_and_exit(&pOSThread->taskComplete, 0);
 #endif
-
 	return 0;
 }
 
@@ -565,37 +563,13 @@ INT ral_task_notify_exit(
 void ral_task_customize(
 	IN KTHREAD *pTask)
 {
-	RTBT_OS_TASK *pOSTask = (RTBT_OS_TASK *)pTask->pOSThread;
-
-
 #ifndef KTHREAD_SUPPORT
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,0)
+	RTBT_OS_TASK *pOSTask = (RTBT_OS_TASK *)pTask->pOSThread;
 	daemonize((PSTRING)&pOSTask->taskName[0]);
-
 	allow_signal(SIGTERM);
 	allow_signal(SIGKILL);
 	current->flags |= PF_NOFREEZE;
-#else
-	unsigned long flags;
-
-	daemonize();
-	reparent_to_init();
-	strcpy(current->comm, &pOSTask->taskName[0]);
-
-	siginitsetinv(&current->blocked, sigmask(SIGTERM) | sigmask(SIGKILL));
-
-	/* Allow interception of SIGKILL only
-	 * Don't allow other signals to interrupt the transmission */
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,4,22)
-	spin_lock_irqsave(&current->sigmask_lock, flags);
-	flush_signals(current);
-	recalc_sigpending(current);
-	spin_unlock_irqrestore(&current->sigmask_lock, flags);
-#endif
-#endif
-
 	RTMP_GET_OS_PID(pOSTask->taskPID, current->pid);
-
     /* signal that we've started the thread */
 	complete(&pOSTask->taskComplete);
 #endif // KTHREAD_SUPPORT //
