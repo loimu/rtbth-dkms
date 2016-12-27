@@ -91,7 +91,7 @@ int rtbt_hci_dev_send(struct sk_buff *skb)
 #endif
     struct rtbt_hps_ops *hps_ops;
     unsigned char pkt_type;
-    int status;
+    int status = -EPERM;
 
     pkt_type = rtbt_get_pkt_type(skb);
 //     printk("hciName:%s type:%s(%d) len:%d\n",
