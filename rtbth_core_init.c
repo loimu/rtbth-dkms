@@ -1177,13 +1177,7 @@ Rtbth_Set_Radio_Led(
 {
 	ULONG value	= 0;
 
-typedef enum
-{
-    OFF = 0x00,
-    ON  = 0x01
-} flag_t;
-
-	DebugPrint(TRACE, DBG_INIT,"Rtbth_Set_Radio_Led %s(%d)\n", (Enable==ON)?"ON":"OFF", Enable);
+	DebugPrint(TRACE, DBG_INIT,"Rtbth_Set_Radio_Led %s(%d)\n", Enable ? "ON":"OFF", Enable);
 
 	if (Enable == TRUE)
 	{
