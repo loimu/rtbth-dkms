@@ -251,7 +251,7 @@ struct rtbt_os_ctrl{
 /*******************************************************************************
 	Memory related functions
  *******************************************************************************/
-int RtlCopyMemory(
+void RtlCopyMemory(
 	IN VOID *Destination,
 	IN const VOID *Source,
 	IN int Length);

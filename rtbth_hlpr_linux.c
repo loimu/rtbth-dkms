@@ -87,12 +87,12 @@ int ral_mem_free(void *ptr)
 }
 
 
-int RtlCopyMemory(
+void RtlCopyMemory(
 	IN VOID *Destination,
 	IN const VOID *Source,
 	IN int Length)
 {
-	return (int)memcpy(Destination, Source, Length);//sean wang linux, fix the build warning, type casting
+	memcpy(Destination, Source, Length);
 }
 
 VOID RtlZeroMemory(
