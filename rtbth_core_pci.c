@@ -197,8 +197,8 @@ static int rtbt_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	return 0;
 
 	// TODO: Shiang, free the resource here.
-err_hps_iface:
-	rtbt_hps_iface_deinit(RAL_INF_PCI, pdev, os_ctrl);
+//err_hps_iface:
+//	rtbt_hps_iface_deinit(RAL_INF_PCI, pdev, os_ctrl);
 
 err_dev_resource:
 	BT_ERR("call rtbt_dev_resource_deinit()");
