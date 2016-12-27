@@ -425,9 +425,7 @@ INT ral_timer_init(
 	os_timer->pOSTimer = kmalloc(sizeof(struct timer_list), GFP_KERNEL);
 	if (os_timer->pOSTimer) {
 		timer = os_timer->pOSTimer;
-		init_timer(timer);
-		timer->function = (void *)func;
-		timer->data = (unsigned long)os_timer;
+		setup_timer(timer, (void *)func, (unsigned long)os_timer);
 		ral_spin_lock(&os_timer->lock, &irqflags);
 		os_timer->state = RES_VALID;
 		ral_spin_unlock(&os_timer->lock, irqflags);
