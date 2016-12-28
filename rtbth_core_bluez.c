@@ -61,12 +61,6 @@ int rtbt_hci_dev_ioctl(struct hci_dev *hdev, unsigned int cmd, unsigned long arg
 }
 #endif
 
-void rtbt_hci_dev_notify(struct hci_dev *hdev, unsigned int evt)
-{
-    BT_WARN("%s(dev=0x%lx): evt=0x%x", __FUNCTION__, (ULONG)hdev, evt);
-    return;
-}
-
 int rtbt_hci_dev_flush(struct hci_dev *hdev)
 {
     BT_WARN("%s(dev=0x%lx)", __FUNCTION__, (ULONG)hdev);
@@ -382,7 +376,6 @@ int rtbt_hps_iface_init(
     os_ctrl->bt_dev = hdev;
     os_ctrl->if_dev = if_dev;
     os_ctrl->hps_ops->recv = rtbt_hci_dev_receive;
-
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     hci_set_drvdata(hdev, os_ctrl);
 #else
@@ -396,7 +389,6 @@ int rtbt_hps_iface_init(
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,13,0)
     hdev->ioctl = rtbt_hci_dev_ioctl;
 #endif
-    hdev->notify = rtbt_hci_dev_notify;
 
     BT_INFO("<--%s(): alloc hdev(0x%lx) done", __FUNCTION__, (ULONG)hdev);
     return 0;
