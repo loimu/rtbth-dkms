@@ -37,6 +37,15 @@
   #define BT_WARN BT_INFO
 #endif // BT_WARN //
 
+// enable hci_skb_pkt_type macro for older kernels
+#ifndef hci_skb_pkt_type
+  #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,14)
+    #define hci_skb_pkt_type(skb) bt_cb((skb))->pkt_type
+  #else
+    #define hci_skb_pkt_type(skb) (skb)->pkt_type
+  #endif
+#endif // hci_skb_pkt_type //
+
 /*
 	Following three definitions are defined in kernelSrc/include/net/bluetooth/hci.h,
 	But our code also has typedef enum for these three constants, so we undefine it

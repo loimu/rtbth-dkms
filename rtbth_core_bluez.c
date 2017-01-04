@@ -31,26 +31,12 @@
 
 void *g_hdev = 0;
 
-static inline unsigned char rtbt_get_pkt_type(struct sk_buff *skb)
-{
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,5,0)
+static inline unsigned char rtbt_get_pkt_type(struct sk_buff *skb) {
     return hci_skb_pkt_type(skb);
-#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,14)
-    return bt_cb(skb)->pkt_type;
-#else
-    return skb->pkt_type;
-#endif
 }
 
-static inline void rtbt_set_pkt_type(struct sk_buff *skb, unsigned char type)
-{
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,5,0)
+static inline void rtbt_set_pkt_type(struct sk_buff *skb, unsigned char type){
     hci_skb_pkt_type(skb) = type;
-#elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,14)
-    bt_cb(skb)->pkt_type = type;
-#else
-    skb->pkt_type = type;
-#endif
 }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,13,0)
