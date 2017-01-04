@@ -55,18 +55,18 @@ static int rtbt_pci_suspend(struct pci_dev *pdev, pm_message_t state)
     struct hci_dev *hci_dev = (struct hci_dev *)pci_get_drvdata(pdev);
     struct rtbt_os_ctrl *os_ctrl;
     BT_DBG("-->%s(): pm_message_state=%d", __FUNCTION__, state.event);
-    if (hci_dev == NULL){
+    if (!hci_dev) {
         BT_ERR("%s(): pci_get_drvdata failed!", __FUNCTION__);
-        return -1;
+        return -ENODEV;
     }
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hci_dev);
 #else
     os_ctrl = (struct rtbt_os_ctrl *)(hci_dev->driver_data);
 #endif
-    if (os_ctrl == NULL) {
+    if (!os_ctrl) {
         BT_ERR("%s(): hci_dev->driver_data is NULL!", __FUNCTION__);
-        return -1;
+        return -ENODATA;
     }
 //msleep(10000);
 //    rtbt_hps_iface_detach(os_ctrl);
@@ -80,18 +80,18 @@ static int rtbt_pci_resume(struct pci_dev *pdev)
     struct hci_dev *hci_dev = (struct hci_dev *)pci_get_drvdata(pdev);
     struct rtbt_os_ctrl *os_ctrl;
     BT_DBG("-->%s()", __FUNCTION__);
-    if (hci_dev == NULL){
+    if (!hci_dev) {
         BT_ERR("%s(): pci_get_drvdata failed!", __FUNCTION__);
-        return -1;
+        return -ENODEV;
     }
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hci_dev);
 #else
     os_ctrl = (struct rtbt_os_ctrl *)(hci_dev->driver_data);
 #endif
-    if (os_ctrl == NULL) {
+    if (!os_ctrl) {
         BT_ERR("%s(): hci_dev->driver_data is NULL!", __FUNCTION__);
-        return -1;
+        return -ENODATA;
     }
  //   os_ctrl->hps_ops->resume(os_ctrl->dev_ctrl);
  //   rtbt_hps_iface_attach(os_ctrl);
