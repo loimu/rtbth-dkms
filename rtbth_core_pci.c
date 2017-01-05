@@ -105,7 +105,7 @@ static int rtbt_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	void __iomem *csr_addr = NULL;
 	int rv;
 
-	BT_INFO("-->%s(): probe for device(Vendor=0x%x, Device=0x%p)",
+	BT_DBG("-->%s(): probe for device(Vendor=0x%x, Device=0x%p)",
 			__FUNCTION__, pdev->vendor, &pdev->device);
 
 	if (!id->driver_data) {
@@ -185,7 +185,7 @@ static int rtbt_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	if (rtbt_hps_iface_attach(os_ctrl))
 		goto err_hps_iface;
 #endif
-	BT_INFO("<--%s()", __FUNCTION__);
+	BT_DBG("<--%s()", __FUNCTION__);
 	return 0;
 
 	// TODO: Shiang, free the resource here.

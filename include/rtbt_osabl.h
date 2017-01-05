@@ -224,6 +224,7 @@ struct rtbt_hps_ops{
 	int (*hci_sco_data)(void *dev_ctrl, void *buf, ULONG len);
 	int (*flush)(void *handle);
 	int (*ioctl)(void *handle, unsigned int cmd, unsigned long arg);
+	void (*destruct)(void *handle);
 	void (*notify)(void *handle, unsigned int evt);
 };
 
