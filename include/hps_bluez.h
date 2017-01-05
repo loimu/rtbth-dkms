@@ -52,19 +52,7 @@
   #define hci_get_drvdata(hdev) (hdev)->driver_data
 #endif
 
-/*
-	Following three definitions are defined in kernelSrc/include/net/bluetooth/hci.h,
-	But our code also has typedef enum for these three constants, so we undefine it
-	here to make compile.
-
-	For two module cases, this can ignore it.
-*/
-#undef SCO_LINK
-#undef ACL_LINK
-#undef ESCO_LINK
-
 struct rtbt_os_ctrl;
-
 
 int rtbt_hps_iface_init(int if_type, void *if_dev, struct rtbt_os_ctrl *ctrl);
 int rtbt_hps_iface_deinit(int if_type, void *if_dev, struct rtbt_os_ctrl *os_ctrl);
