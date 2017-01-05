@@ -1,5 +1,5 @@
-This is a kernel module for Ralink RT3290 chip which makes it work with Bluez
-software and driver.
+This is a Linux kernel module for a Ralink RT3290 wireless device.
+It enables [Bluez](http://www.bluez.org) software and driver support for RT3290.
 
 This module has no official support by Mediatek. Support was discontinued.
 
@@ -24,7 +24,6 @@ sudo rmmod rtbth
 ```
 
 
-### Blob issues: ###
+### Installation: ###
 
-No support for Bluetooth Protocol v4.0 and more recent.
-Configure your devices to use legacy mode.
+[Ubuntu and derivatives](https://launchpad.net/~blaze/+archive/ubuntu/rtbth-dkms)
