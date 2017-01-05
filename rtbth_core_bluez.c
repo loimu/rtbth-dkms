@@ -247,7 +247,7 @@ int rtbt_hps_iface_resume(IN struct rtbt_os_ctrl *os_ctrl)
 int rtbt_hps_iface_detach(IN struct rtbt_os_ctrl *os_ctrl)
 {
     struct hci_dev *hdev = os_ctrl->bt_dev;
-    BT_INFO("-->%s()", __FUNCTION__);
+    BT_DBG("-->%s()", __FUNCTION__);
     rtbt_dev_hold(hdev);
     /* unregister HCI device */
     if (!hdev) {
@@ -256,14 +256,14 @@ int rtbt_hps_iface_detach(IN struct rtbt_os_ctrl *os_ctrl)
     }
     hci_unregister_dev(hdev);
     rtbt_dev_put(hdev);
-    BT_INFO("<--%s()", __FUNCTION__);
+    BT_DBG("<--%s()", __FUNCTION__);
     return 0;
 }
 
 int rtbt_hps_iface_attach(IN struct rtbt_os_ctrl *os_ctrl)
 {
     struct hci_dev *hdev = os_ctrl->bt_dev;
-    BT_INFO("-->%s()", __FUNCTION__);
+    BT_DBG("-->%s()", __FUNCTION__);
     rtbt_dev_hold(hdev);
     /* Register HCI device */
     if (hci_register_dev(hdev) < 0) {
@@ -271,7 +271,7 @@ int rtbt_hps_iface_attach(IN struct rtbt_os_ctrl *os_ctrl)
         return -ENODEV;
     }
     rtbt_dev_put(hdev);
-    BT_INFO("<--%s()", __FUNCTION__);
+    BT_DBG("<--%s()", __FUNCTION__);
     return 0;
 }
 
@@ -299,7 +299,7 @@ int rtbt_hps_iface_init(
     IN struct rtbt_os_ctrl *os_ctrl)
 {
     struct hci_dev *hdev;
-    BT_INFO("-->%s(): if_type=%d", __FUNCTION__, if_type);
+    BT_DBG("-->%s(): if_type=%d", __FUNCTION__, if_type);
     /* Initialize HCI device */
     hdev = hci_alloc_dev();
     if (!hdev) {
@@ -349,6 +349,6 @@ int rtbt_hps_iface_init(
     hdev->owner = THIS_MODULE;
 #endif
 
-    BT_INFO("<--%s(): alloc hdev(0x%lx) done", __FUNCTION__, (ULONG)hdev);
+    BT_DBG("<--%s(): alloc hdev(0x%lx) done", __FUNCTION__, (ULONG)hdev);
     return 0;
 }
