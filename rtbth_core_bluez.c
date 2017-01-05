@@ -31,14 +31,6 @@
 
 void *g_hdev = 0;
 
-static inline unsigned char rtbt_get_pkt_type(struct sk_buff *skb) {
-    return hci_skb_pkt_type(skb);
-}
-
-static inline void rtbt_set_pkt_type(struct sk_buff *skb, unsigned char type){
-    hci_skb_pkt_type(skb) = type;
-}
-
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,13,0)
 int rtbt_hci_dev_ioctl(struct hci_dev *hdev, unsigned int cmd, unsigned long arg)
 {
@@ -69,7 +61,7 @@ int rtbt_hci_dev_send(struct sk_buff *skb)
     unsigned char pkt_type;
     int status = -EPERM;
 
-    pkt_type = rtbt_get_pkt_type(skb);
+    pkt_type = hci_skb_pkt_type(skb);
 //     printk("hciName:%s type:%s(%d) len:%d\n",
 //            hdev->name, pkt_type_str[pkt_type],
 //            pkt_type, skb->len);
@@ -166,7 +158,7 @@ int rtbt_hci_dev_receive(void *bt_dev, int pkt_type, char *buf, int len)
         return -ENOMEM;
     }
     skb->dev = g_hdev;
-    rtbt_set_pkt_type(skb, pkt_type);
+    hci_skb_pkt_type(skb) = pkt_type; // set pkt type
     memcpy(skb_put(skb, len), buf, len);
     if (pkt_type == HCI_SCODATA_PKT)
         BT_WARN("%s(): send sco data to OS, time=0x%lx", __FUNCTION__, jiffies);
