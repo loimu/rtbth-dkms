@@ -59,11 +59,7 @@ static int rtbt_pci_suspend(struct pci_dev *pdev, pm_message_t state)
         BT_ERR("%s(): pci_get_drvdata failed!", __FUNCTION__);
         return -ENODEV;
     }
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hci_dev);
-#else
-    os_ctrl = (struct rtbt_os_ctrl *)(hci_dev->driver_data);
-#endif
     if (!os_ctrl) {
         BT_ERR("%s(): hci_dev->driver_data is NULL!", __FUNCTION__);
         return -ENODATA;
@@ -84,11 +80,7 @@ static int rtbt_pci_resume(struct pci_dev *pdev)
         BT_ERR("%s(): pci_get_drvdata failed!", __FUNCTION__);
         return -ENODEV;
     }
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hci_dev);
-#else
-    os_ctrl = (struct rtbt_os_ctrl *)(hci_dev->driver_data);
-#endif
     if (!os_ctrl) {
         BT_ERR("%s(): hci_dev->driver_data is NULL!", __FUNCTION__);
         return -ENODATA;
@@ -243,11 +235,7 @@ static void rtbt_pci_remove(struct pci_dev *pdev)
 		return;
 	}
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
-    os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hci_dev);
-#else
-    os_ctrl = (struct rtbt_os_ctrl *)(hci_dev->driver_data);
-#endif
+	os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hci_dev);
 	if (os_ctrl == NULL) {
 		BT_ERR("%s(): hci_dev->driver_data is NULL!", __FUNCTION__);
 		return;
@@ -351,11 +339,7 @@ BthIsr(int irq, void *dev_instance, struct pt_regs *regs)
 	}
 
 	if (hdev){
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
 		os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hdev);
-#else
-        os_ctrl = (struct rtbt_os_ctrl *)hdev->driver_data;
-#endif
 		ASSERT(os_ctrl);
 		if (os_ctrl && os_ctrl->if_ops.pci_ops.isr) {
 			retval = (os_ctrl->if_ops.pci_ops.isr)(os_ctrl->dev_ctrl);

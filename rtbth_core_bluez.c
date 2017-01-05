@@ -64,11 +64,7 @@ int rtbt_hci_dev_send(struct sk_buff *skb)
 {
     struct hci_dev *hdev = (struct hci_dev *)skb->dev;
 #endif
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     struct rtbt_os_ctrl *os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hdev);
-#else
-    struct rtbt_os_ctrl *os_ctrl = (struct rtbt_os_ctrl *)hdev->driver_data;
-#endif
     struct rtbt_hps_ops *hps_ops;
     unsigned char pkt_type;
     int status = -EPERM;
@@ -218,11 +214,7 @@ int rtbt_hci_dev_open(struct hci_dev *hdev)
 int rtbt_hci_dev_close(struct hci_dev *hdev)
 {
     int status = -EPERM;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     struct rtbt_os_ctrl *os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hdev);
-#else
-    struct rtbt_os_ctrl *os_ctrl = (struct rtbt_os_ctrl *)hdev->driver_data;
-#endif
     BT_DBG("-->%s()", __FUNCTION__);
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,4,0)
     if (!test_and_clear_bit(HCI_RUNNING, &(hdev->flags))){
@@ -360,10 +352,8 @@ int rtbt_hps_iface_init(
     os_ctrl->bt_dev = hdev;
     os_ctrl->if_dev = if_dev;
     os_ctrl->hps_ops->recv = rtbt_hci_dev_receive;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     hci_set_drvdata(hdev, os_ctrl);
-#else
-    hdev->driver_data = os_ctrl;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0)
     hdev->owner = THIS_MODULE;
 #endif
     hdev->open = rtbt_hci_dev_open;

@@ -46,6 +46,12 @@
   #endif
 #endif // hci_skb_pkt_type //
 
+// define hci_set/get_drvdata macro for older kernels
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0)
+  #define hci_set_drvdata(hdev, os_ctrl) (hdev)->driver_data = (os_ctrl)
+  #define hci_get_drvdata(hdev) (hdev)->driver_data
+#endif
+
 /*
 	Following three definitions are defined in kernelSrc/include/net/bluetooth/hci.h,
 	But our code also has typedef enum for these three constants, so we undefine it
