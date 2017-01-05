@@ -46,10 +46,16 @@
   #endif
 #endif // hci_skb_pkt_type //
 
-// define hci_set/get_drvdata macro for older kernels
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,4,0)
+  // define hci_set/get_drvdata macro for older kernels
   #define hci_set_drvdata(hdev, os_ctrl) (hdev)->driver_data = (os_ctrl)
   #define hci_get_drvdata(hdev) (hdev)->driver_data
+  // define rtbt_dev_hold and rtbt_dev_put
+  #define rtbt_dev_hold(hdev) __hci_dev_hold((hdev))
+  #define rtbt_dev_put(hdev) __hci_dev_put((hdev))
+#else
+  #define rtbt_dev_hold(hdev) hci_dev_hold((hdev))
+  #define rtbt_dev_put(hdev) hci_dev_put((hdev))
 #endif
 
 struct rtbt_os_ctrl;

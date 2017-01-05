@@ -248,22 +248,14 @@ int rtbt_hps_iface_detach(IN struct rtbt_os_ctrl *os_ctrl)
 {
     struct hci_dev *hdev = os_ctrl->bt_dev;
     BT_INFO("-->%s()", __FUNCTION__);
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
-    hci_dev_hold(hdev);
-#else
-    __hci_dev_hold(hdev);
-#endif
+    rtbt_dev_hold(hdev);
     /* unregister HCI device */
     if (!hdev) {
         BT_ERR("%s(): os_ctrl(%p)->bt_dev is NULL", __FUNCTION__, os_ctrl);
         return -1;
     }
     hci_unregister_dev(hdev);
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
-    hci_dev_put(hdev);
-#else
-    __hci_dev_put(hdev);
-#endif
+    rtbt_dev_put(hdev);
     BT_INFO("<--%s()", __FUNCTION__);
     return 0;
 }
@@ -272,21 +264,13 @@ int rtbt_hps_iface_attach(IN struct rtbt_os_ctrl *os_ctrl)
 {
     struct hci_dev *hdev = os_ctrl->bt_dev;
     BT_INFO("-->%s()", __FUNCTION__);
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
-    hci_dev_hold(hdev);
-#else
-    __hci_dev_hold(hdev);
-#endif
+    rtbt_dev_hold(hdev);
     /* Register HCI device */
     if (hci_register_dev(hdev) < 0) {
         BT_ERR("Can't register HCI device");
         return -ENODEV;
     }
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
-    hci_dev_put(hdev);
-#else
-    __hci_dev_put(hdev);
-#endif
+    rtbt_dev_put(hdev);
     BT_INFO("<--%s()", __FUNCTION__);
     return 0;
 }
