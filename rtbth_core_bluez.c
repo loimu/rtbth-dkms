@@ -191,8 +191,10 @@ int rtbt_hci_dev_open(struct hci_dev *hdev)
     struct rtbt_os_ctrl *os_ctrl = (struct rtbt_os_ctrl *)hdev->driver_data;
 #endif
     BT_DBG("-->%s()", __FUNCTION__);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,4,0)
     if (test_bit(HCI_RUNNING, &hdev->flags))
         return 0;
+#endif
     if (os_ctrl && os_ctrl->hps_ops && os_ctrl->hps_ops->open)
         status = os_ctrl->hps_ops->open(os_ctrl->dev_ctrl);
     else {
