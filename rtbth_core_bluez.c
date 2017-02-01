@@ -185,11 +185,7 @@ int rtbt_hci_dev_receive(void *bt_dev, int pkt_type, char *buf, int len)
 int rtbt_hci_dev_open(struct hci_dev *hdev)
 {
     int status = -EPERM;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,4,0)
     struct rtbt_os_ctrl *os_ctrl = (struct rtbt_os_ctrl *)hci_get_drvdata(hdev);
-#else
-    struct rtbt_os_ctrl *os_ctrl = (struct rtbt_os_ctrl *)hdev->driver_data;
-#endif
     BT_DBG("-->%s()", __FUNCTION__);
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,4,0)
     if (test_bit(HCI_RUNNING, &hdev->flags))
