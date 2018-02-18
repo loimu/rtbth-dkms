@@ -425,7 +425,11 @@ INT ral_timer_init(
 	os_timer->pOSTimer = kmalloc(sizeof(struct timer_list), GFP_KERNEL);
 	if (os_timer->pOSTimer) {
 		timer = os_timer->pOSTimer;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,15,0)
+		timer_setup(timer, (void *)func, 0);
+#else
 		setup_timer(timer, (void *)func, (unsigned long)os_timer);
+#endif
 		ral_spin_lock(&os_timer->lock, &irqflags);
 		os_timer->state = RES_VALID;
 		ral_spin_unlock(&os_timer->lock, irqflags);
