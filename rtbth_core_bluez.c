@@ -105,7 +105,7 @@ int rtbt_hci_dev_send(struct sk_buff *skb)
                 hdev->stat.acl_tx++;
             break;
         case HCI_SCODATA_PKT:
-            BT_WARN("%s(): sco len=%d,time=0x%lx", __FUNCTION__, skb->len, jiffies);
+            BT_DBG("%s(): sco len=%d,time=0x%lx", __FUNCTION__, skb->len, jiffies);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)
             os_ctrl->sco_tx_seq = bt_cb(skb)->l2cap.txseq;
 #elif LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
@@ -117,7 +117,7 @@ int rtbt_hci_dev_send(struct sk_buff *skb)
             status = hps_ops->hci_sco_data(os_ctrl->dev_ctrl, skb->data, skb->len);
             if (hdev && (status == 0))
                 hdev->stat.sco_tx++;
-            BT_WARN("%s(): sco done, time=0x%lx", __FUNCTION__, jiffies);
+            BT_DBG("%s(): sco done, time=0x%lx", __FUNCTION__, jiffies);
             break;
         case HCI_VENDOR_PKT:
             break;
@@ -169,7 +169,7 @@ int rtbt_hci_dev_receive(void *bt_dev, int pkt_type, char *buf, int len)
     hci_skb_pkt_type(skb) = pkt_type; // set pkt type
     memcpy(skb_put(skb, len), buf, len);
     if (pkt_type == HCI_SCODATA_PKT)
-        BT_WARN("%s(): send sco data to OS, time=0x%lx", __FUNCTION__, jiffies);
+        BT_DBG("%s(): send sco data to OS, time=0x%lx", __FUNCTION__, jiffies);
     hdev = (struct hci_dev *)skb->dev;
     if (hdev)
         hdev->stat.byte_rx += len;
