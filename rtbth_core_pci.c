@@ -167,14 +167,13 @@ static int rtbt_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		goto err_out_free_res;
 
 	os_ctrl->dev_ops = dev_ops;
-
+	os_ctrl->if_dev = (void *) pdev;
 //    rtbth_us_init(os_ctrl->dev_ctrl);
 
 	BT_WARN("call dev_ops->dev_resource_init!");
 	if (dev_ops->dev_resource_init(os_ctrl))
 		goto err_dev_ctrl;
 
-    os_ctrl->if_dev = (void *) pdev;
 
     rtbth_us_init(os_ctrl->dev_ctrl);
 	/* Init the host protocol stack hooking interface */
