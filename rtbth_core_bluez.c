@@ -25,6 +25,7 @@
 *************************************************************************/
 
 #include <linux/pci.h>
+#include <linux/skbuff.h>
 #include "rt_linux.h"
 #include "hps_bluez.h"
 #include "rtbt_osabl.h"
@@ -136,7 +137,6 @@ int rtbt_hci_dev_receive(void *bt_dev, int pkt_type, char *buf, int len)
 {
     struct hci_dev *hdev = 0;
     struct sk_buff *skb;
-    int status;
 
     //printk("-->%s(): receive info: pkt_type=%d(%s), len=%d!\n", __FUNCTION__,
            //pkt_type, pkt_type <= 5 ? pkt_type_str[pkt_type] : "ErrPktType", len);
@@ -175,11 +175,10 @@ int rtbt_hci_dev_receive(void *bt_dev, int pkt_type, char *buf, int len)
         hdev->stat.byte_rx += len;
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,13,0)
-    status = hci_recv_frame(hdev, skb);
+    return hci_recv_frame(hdev, skb);
 #else
-    status = hci_recv_frame(skb);
+    return hci_recv_frame(skb);
 #endif
-    return status;
 }
 
 int rtbt_hci_dev_open(struct hci_dev *hdev)
