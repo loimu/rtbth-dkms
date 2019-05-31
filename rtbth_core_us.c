@@ -1839,9 +1839,13 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
 
                 if(dmac.dmac_op == 0){
                     RtbtResetPDMA(gpAd);
-                }else if(dmac.dmac_op == 1){
+                }
+		    
+		if(dmac.dmac_op == 1){
                     BthEnableRxTx(gpAd);
-                }else if(dmac.dmac_op == 2){
+                }
+		
+		if(dmac.dmac_op == 2){
                     DebugPrint(TRACE, DBG_MISC, "%s:kfifo reset ==>\n", __func__);
                     kfifo_reset(gpAd->acl_fifo);
                     kfifo_reset(gpAd->hci_fifo);
