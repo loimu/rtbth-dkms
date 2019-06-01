@@ -1837,14 +1837,6 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                 }
                 DebugPrint(ERROR, DBG_INIT,"RTBTH_IOCDMAC: dmac.dmac_op=%d\n", dmac.dmac_op);
 
-                if(dmac.dmac_op == 0){
-                    RtbtResetPDMA(gpAd);
-                }
-
-                if(dmac.dmac_op == 1){
-                    BthEnableRxTx(gpAd);
-                }
-
                 if(dmac.dmac_op == 2){
                     DebugPrint(
                         TRACE, DBG_MISC, "%s:kfifo reset ==>\n", __func__);
@@ -1855,6 +1847,14 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                     kfifo_reset(gpAd->rx_fifo);
                     DebugPrint(
                         TRACE, DBG_MISC, "%s:kfifo reset <== \n", __func__);
+                }
+
+                if(dmac.dmac_op == 0){
+                    RtbtResetPDMA(gpAd);
+                }
+
+                if(dmac.dmac_op == 1){
+                    BthEnableRxTx(gpAd);
                 }
 
                 // the check below is false for 0..2 while dmac_op is an int
