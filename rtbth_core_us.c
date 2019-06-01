@@ -1840,24 +1840,29 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                 if(dmac.dmac_op == 0){
                     RtbtResetPDMA(gpAd);
                 }
-		    
-		if(dmac.dmac_op == 1){
+
+                if(dmac.dmac_op == 1){
                     BthEnableRxTx(gpAd);
                 }
-		
-		if(dmac.dmac_op == 2){
-                    DebugPrint(TRACE, DBG_MISC, "%s:kfifo reset ==>\n", __func__);
+
+                if(dmac.dmac_op == 2){
+                    DebugPrint(
+                        TRACE, DBG_MISC, "%s:kfifo reset ==>\n", __func__);
                     kfifo_reset(gpAd->acl_fifo);
                     kfifo_reset(gpAd->hci_fifo);
                     kfifo_reset(gpAd->evt_fifo);
                     kfifo_reset(gpAd->sco_fifo);
                     kfifo_reset(gpAd->rx_fifo);
-                    DebugPrint(TRACE, DBG_MISC, "%s:kfifo reset <== \n", __func__);
+                    DebugPrint(
+                        TRACE, DBG_MISC, "%s:kfifo reset <== \n", __func__);
                 }
-                else {
-                     DebugPrint(ERROR, DBG_INIT,"No such the dma op = %d\n", dmac.dmac_op);
+
+                // the check below is false for 0..2 while dmac_op is an int
+                if(dmac.dmac_op/3 != 0){ 
+                     DebugPrint(
+                         ERROR, DBG_INIT,"No such dma op = %d\n", dmac.dmac_op);
                 }
-            }while(0);
+            } while(0);
             break;
 #if 1
         case RTBTH_IOCRMODE:
