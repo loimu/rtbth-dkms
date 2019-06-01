@@ -1859,8 +1859,8 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
 
                 // the check below is false for 0..2 while dmac_op is an int
                 if(dmac.dmac_op/3 != 0){
-                     DebugPrint(
-                         ERROR, DBG_INIT,"No such dmac op=%d\n", dmac.dmac_op);
+                    DebugPrint(
+                        ERROR, DBG_INIT, "No such dmac op=%d\n", dmac.dmac_op);
                 }
             } while(0);
             break;
