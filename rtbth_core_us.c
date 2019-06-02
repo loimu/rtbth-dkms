@@ -1832,10 +1832,12 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
 
                 if (copy_from_user(&dmac, (void *)arg, sizeof(dmac))) {
                     retval = -EFAULT;
-                    DebugPrint(ERROR, DBG_INIT,"copy_from_user failed at %d\n", __LINE__);
+                    DebugPrint(ERROR, DBG_INIT,
+                               "copy_from_user failed at %d\n", __LINE__);
                     break;
                 }
-                DebugPrint(ERROR, DBG_INIT,"RTBTH_IOCDMAC: dmac.dmac_op=%d\n", dmac.dmac_op);
+                DebugPrint(ERROR, DBG_INIT,
+                           "RTBTH_IOCDMAC: dmac.dmac_op=%d\n", dmac.dmac_op);
 
                 if(dmac.dmac_op == 0){
                     RtbtResetPDMA(gpAd);
@@ -1857,8 +1859,7 @@ long    rtbth_us_unlocked_ioctl(struct file *filp, unsigned int cmd, unsigned lo
                         TRACE, DBG_MISC, "%s:kfifo reset <== \n", __func__);
                 }
 
-                // the check below is false for 0..2 while dmac_op is an int
-                if(dmac.dmac_op/3 != 0){
+                if(dmac.dmac_op > 2){
                     DebugPrint(
                         ERROR, DBG_INIT, "No such dmac op=%d\n", dmac.dmac_op);
                 }
