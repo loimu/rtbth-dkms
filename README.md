@@ -3,6 +3,9 @@ It enables [Bluez](http://www.bluez.org) software and driver support for RT3290.
 
 This module has no official support by Mediatek. Support was discontinued.
 
+### Compiling: ###
+
+TODO
 
 ### Usage: ###
 
