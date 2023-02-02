@@ -3,6 +3,13 @@ It enables [Bluez](http://www.bluez.org) software and driver support for RT3290.
 
 This module has no official support by Mediatek. Support was discontinued.
 
+This module should work for Ubuntu version 22.10.
+
+### Build: ###
+```sh
+make
+sudo make install
+```
 
 ### Usage: ###
 
