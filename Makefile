@@ -14,7 +14,7 @@ $(MOD_NAME)-objs := rtbth_core_main.o \
 					rtbth_hlpr_linux.o \
 
 ccflags-y := -I$(src)/include
-ccflags-y += -DDBG -DRT3298 -DRTBT_IFACE_PCI -DLINUX
+ccflags-y += -DDBG -DRT3298 -DRTBT_IFACE_PCI -DLINUX -w
 
 MAKE = make
 LINUX_SRC ?= /lib/modules/$(shell uname -r)/build
@@ -27,9 +27,9 @@ clean:
 	$(MAKE) -C $(LINUX_SRC) M=$(PWD) clean
 
 install:
-	#$(MAKE) INSTALL_MOD_PATH=$(DESTDIR) INSTALL_MOD_DIR=$(MDIR) \
-	#	-C $(LINUX_SRC) M=$(PWD) modules_install
-	#depmod -a
+	$(MAKE) INSTALL_MOD_PATH=$(DESTDIR) INSTALL_MOD_DIR=$(MDIR) \
+		-C $(LINUX_SRC) M=$(PWD) modules_install
+	depmod -a
 	## uncomment the three lines above if you wanna use `make install` instead of dkms
 	install -m 0755 -o root -g root tools/49rtbt $(DESTDIR)/usr/lib/pm-utils/sleep.d/
 	install -m 0755 -o root -g root tools/rtbt $(DESTDIR)/usr/bin/

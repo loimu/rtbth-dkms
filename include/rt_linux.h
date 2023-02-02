@@ -201,7 +201,7 @@ typedef struct _RTMP_OS_FS_INFO_
 	int				fsuid;
 	int				fsgid;
 #endif
-	mm_segment_t	fs;
+	//mm_segment_t	fs;
 }RTMP_OS_FS_INFO;
 
 #define IS_FILE_OPEN_ERR(_fd) 	IS_ERR((_fd))

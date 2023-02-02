@@ -28,7 +28,7 @@
 #define __RTBT_TYPE_H
 
 #ifdef __GNUC__
-#include <stdarg.h>
+#include <linux/stdarg.h>
 #endif // __GNUC__ //
 
 typedef signed char		INT8;
