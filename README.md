@@ -11,9 +11,3 @@ The problem arises due to changes introduced in newer kernels that break compati
 
 ### Community Discussion
 For more context and discussions regarding this problem, see the [Arch Linux Forum thread](https://bbs.archlinux.org/viewtopic.php?id=298200).
-
-## Contributions
-Contributions to improve and maintain this fork are welcome. Please feel free to submit pull requests or open issues.
-
-## License
-This project inherits the license of the original **rtbth-dkms** driver.
