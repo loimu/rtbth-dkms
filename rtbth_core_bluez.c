@@ -314,7 +314,9 @@ int rtbt_hps_iface_init(
 #else
                 hdev->type = HCI_PCI;
 #endif
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,8,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,10,0)
+                // dev_type completely removed https://github.com/torvalds/linux/commit/84a4bb6548a29326564f0e659fb8064503ecc1c7
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4,8,0)
                 hdev->dev_type = HCI_PRIMARY;
 #else
                 hdev->dev_type = HCI_BREDR;
