@@ -376,7 +376,11 @@ BOOLEAN KeCancelTimer(
 
 	ral_spin_lock(&os_timer->lock, &irqflags);
 	if (os_timer->pOSTimer && (os_timer->state == RES_VALID)) {
-		status = timer_shutdown_sync((struct timer_list *)os_timer->pOSTimer);
+    #ifdef timer_shutdown_sync
+      status = timer_shutdown_sync((struct timer_list *)os_timer->pOSTimer);
+    #else
+      status = del_timer_sync((struct timer_list *)os_timer->pOSTimer);
+    #endif
 		if (status < 0)
 			printk("%s(): del os timer failed(%d)!\n", __FUNCTION__, status);
 	}
@@ -400,7 +404,11 @@ INT KeFreeTimer(
 	if (os_timer->pOSTimer) {
 		timer = (struct timer_list *)os_timer->pOSTimer;
 		if (timer_pending(timer))
-			timer_shutdown_sync(timer);
+    #ifdef timer_shutdown_sync
+      timer_shutdown_sync(timer);
+    #else
+      del_timer_sync(timer);
+    #endif
 		kfree(timer);
 		os_timer->pOSTimer = NULL;
 	}
