@@ -19,6 +19,10 @@ ccflags-y += -DDBG -DRT3298 -DRTBT_IFACE_PCI -DLINUX
 MAKE = make
 LINUX_SRC ?= /lib/modules/$(shell uname -r)/build
 PWD := $(shell pwd)
+PREFIX ?= /usr/local
+ETCDIR ?= /etc/
+LIBDIR = $(PREFIX)/lib
+BINDIR= $(PREFIX)/bin
 
 all:
 	$(MAKE) -C $(LINUX_SRC) M=$(PWD) modules
@@ -31,6 +35,6 @@ install:
 	#	-C $(LINUX_SRC) M=$(PWD) modules_install
 	#depmod -a
 	## uncomment the three lines above if you wanna use `make install` instead of dkms
-	install -m 0755 -o root -g root tools/49rtbt $(DESTDIR)/usr/lib/pm-utils/sleep.d/
-	install -m 0755 -o root -g root tools/rtbt $(DESTDIR)/usr/bin/
-	install -m 0644 -o root -g root tools/ralink-bt.conf $(DESTDIR)/etc/modprobe.d/
+	install -m 0755 -o root -g root tools/49rtbt $(LIBDIR)/pm-utils/sleep.d/
+	install -m 0755 -o root -g root tools/rtbt $(BINDIR)/
+	install -m 0644 -o root -g root tools/ralink-bt.conf $(ETCDIR)/modprobe.d/
